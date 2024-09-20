@@ -27,6 +27,8 @@ namespace linerider.UI
 
         private CheckProperty leftAGW;
         private CheckProperty rightAGW;
+        private CheckProperty[] collisionMask;
+        private bool[] masks;
         public LineWindow(GameCanvas parent, Editor editor, GameLine line) : base(parent, editor)
         {
             _ownerline = line;
@@ -154,6 +156,9 @@ namespace linerider.UI
             bool leftEXT = ((StandardLine)_ownerline).Extension == StandardLine.Ext.Both || ((StandardLine)_ownerline).Extension == StandardLine.Ext.Left;
             bool rightEXT = ((StandardLine)_ownerline).Extension == StandardLine.Ext.Both || ((StandardLine)_ownerline).Extension == StandardLine.Ext.Right;
 
+            masks = new bool[16];
+            ((StandardLine)_ownerline).collision_mask.CopyTo(masks, 0);
+
             if (_ownerline is RedLine red)
             {
                 currentMultiplier = red.Multiplier;
@@ -259,6 +264,24 @@ namespace linerider.UI
             {
                 UpdateAGWs(leftAGW.IsChecked, rightAGW.IsChecked);
             };
+            if (!_editor.GetTrack().collision_mask) return;
+            collisionMask = new CheckProperty[10];
+            for (int i = 0; i < 10; i++) {
+                CheckProperty check = GwenHelper.AddPropertyCheckbox(table, i.ToString(), masks[i]);
+                int copy = i;
+                check.ValueChanged += (o, e) => {
+                    masks[copy] = collisionMask[copy].IsChecked;
+                    CollisionMask(masks);
+                };
+                collisionMask[i] = check;
+            }
+        }
+        private void CollisionMask(bool[] newmask) {
+            StandardLine copy = (StandardLine)_ownerline;
+            copy.collision_mask = new System.Collections.BitArray(newmask);
+            using (var trk = _editor.CreateTrackWriter()) {
+                UpdateOwnerLine(trk, copy);
+            }
         }
         private void SetupLineRightClickOptions(PropertyTree tree)
         {

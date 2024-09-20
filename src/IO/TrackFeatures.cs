@@ -10,5 +10,6 @@ namespace linerider.IO
         public const string zerostart = "ZEROSTART";
         public const string remount = "REMOUNT";
         public const string frictionless = "FRICTIONLESS";
+        public const string collision_mask = "COLLISION_MASK";
     }
 }

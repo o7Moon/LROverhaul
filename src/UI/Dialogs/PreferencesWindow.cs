@@ -1019,6 +1019,16 @@ namespace linerider.UI
         }
         private void PopulateOther(ControlBase parent)
         {
+            if (_editor.GetTrack().collision_mask){ 
+                Checkbox[] maskboxes = new Checkbox[10];
+                for (int i = 0; i < 10; i++) {
+                    int copy = i;
+                    maskboxes[copy] = GwenHelper.AddCheckbox(parent, copy.ToString(), Settings.default_mask[copy], (o, e) => {
+                        Settings.default_mask[copy] = maskboxes[copy].IsChecked;
+                    });
+                }
+            }
+
             Panel audioGroup = GwenHelper.CreateHeaderPanel(parent, "Audio");
 
             Label volumeLabel = new Label(null)

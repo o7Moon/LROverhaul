@@ -33,6 +33,7 @@ namespace linerider.IO
                 _ = featurelist.TryGetValue(TrackFeatures.ignorable_trigger, out bool ignorable_trigger);
                 _ = featurelist.TryGetValue(TrackFeatures.remount, out bool remount);
                 _ = featurelist.TryGetValue(TrackFeatures.frictionless, out bool frictionless);
+                _ = featurelist.TryGetValue(TrackFeatures.collision_mask, out bool collision_mask);
                 foreach (KeyValuePair<string, bool> feature in featurelist)
                 {
                     if (feature.Value)
@@ -117,6 +118,15 @@ namespace linerider.IO
                     bw.Write(line.Position1.Y);
                     bw.Write(line.Position2.X);
                     bw.Write(line.Position2.Y);
+
+                    if (line is StandardLine) {
+                        StandardLine ln = (StandardLine)line;
+                        if (collision_mask) {
+                            byte[] mask = new byte[2];
+                            ln.collision_mask.CopyTo(mask, 0);
+                            bw.Write(mask);
+                        }
+                    }
                 }
                 bw.Write(new byte[] { (byte)'M', (byte)'E', (byte)'T', (byte)'A' });
                 List<string> metadata = new List<string>

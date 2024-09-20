@@ -107,6 +107,11 @@ namespace linerider.IO
                 ret[TrackFeatures.remount] = true;
             }
 
+            if (trk.collision_mask)
+            {
+                ret[TrackFeatures.collision_mask] = true;
+            }
+
             return ret;
         }
         /// Checks a relative filename for validity

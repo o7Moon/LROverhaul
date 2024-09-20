@@ -186,6 +186,10 @@ namespace linerider.UI
             {
                 _editor.Frictionless = frictionless.IsChecked;
             };
+            CheckProperty collision_mask = GwenHelper.AddPropertyCheckbox(table, "Use Collision Mask", _editor.GetTrack().collision_mask);
+            collision_mask.ValueChanged += (o, e) => {
+                _editor.UseCollisionMask = collision_mask.IsChecked;
+            };
 
             NumberProperty ygravity = new NumberProperty(null)
             {

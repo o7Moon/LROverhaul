@@ -4,6 +4,7 @@ using linerider.Utils;
 using OpenTK;
 using OpenTK.Mathematics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -19,6 +20,7 @@ namespace linerider.IO
     "6.1","SONGINFO",
     "IGNORABLE_TRIGGER",
     "ZEROSTART",
+    "COLLISION_MASK"
         };
 
         //private const int REDMULTIPLIER_INDEX = 0;
@@ -225,6 +227,9 @@ namespace linerider.IO
                         case TrackFeatures.frictionless:
                             ret.frictionless = true;
                             break;
+                        case TrackFeatures.collision_mask:
+                            ret.collision_mask = true;
+                            break;
 
                         default:
                             throw new TrackIO.TrackLoadException("Unsupported feature");
@@ -363,6 +368,9 @@ namespace linerider.IO
                     }
                     if (l is StandardLine line)
                     {
+                        if (ret.collision_mask) {
+                            ((StandardLine) l).collision_mask = new BitArray(br.ReadBytes(2));
+                        }
                         if (!addedlines.ContainsKey(l.ID))
                         {
                             addedlines[ID] = line;

@@ -43,6 +43,8 @@ namespace linerider
             AsIs = 0,
             Frame = 1
         }
+
+        public static bool[] default_mask = new bool[16]{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
         public static class Recording
         {
             public static bool ShowTools = false;

@@ -22,6 +22,7 @@ using linerider.Utils;
 using OpenTK;
 using OpenTK.Mathematics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 namespace linerider
@@ -95,6 +96,7 @@ namespace linerider
         public void AddLine(GameLine line)
         {
             if (line is StandardLine)
+                ((StandardLine)line).collision_mask = new BitArray(Settings.default_mask);
                 SaveCells(line.Position1, line.Position2);
 
             Track.AddLine(line);

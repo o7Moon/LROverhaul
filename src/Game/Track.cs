@@ -75,6 +75,7 @@ namespace linerider
         public int RedLines { get; private set; }
         public bool ZeroStart = false;
         public bool frictionless = false;
+        public bool collision_mask = false;
         public bool Remount = true;
         public int BGColorR = Settings.Colors.ExportBg.R;
         public int BGColorG = Settings.Colors.ExportBg.G;

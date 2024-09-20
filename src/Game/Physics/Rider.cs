@@ -194,6 +194,7 @@ namespace linerider.Game
                             continue;
                         foreach (StandardLine line in cell)
                         {
+                            if (!line.collision_mask[i]) continue;
                             if (line.Interact(ref body[i]))
                             {
                                 _ = (collisions?.AddLast(line.ID));

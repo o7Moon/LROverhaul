@@ -16,9 +16,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using linerider.IO.ffmpeg;
 using OpenTK;
 using OpenTK.Mathematics;
 using System;
+using System.Collections;
 
 namespace linerider.Game
 {
@@ -45,6 +47,7 @@ namespace linerider.Game
         public LineTrigger Trigger = null;
         public Vector2d Difference;
         public bool inv = false;
+        public BitArray collision_mask = new BitArray(new byte[2]{0xff, 0xff});
 
         protected double limit_left => Extension.HasFlag(Ext.Left) ? -ExtensionRatio : 0.0;
         protected double limit_right => Extension.HasFlag(Ext.Right) ? 1.0 + ExtensionRatio : 1.0;

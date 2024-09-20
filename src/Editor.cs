@@ -184,6 +184,16 @@ namespace linerider
                 }
             }
         }
+        public bool UseCollisionMask {
+            get => _track.collision_mask;
+            set {
+                if (_track.collision_mask != value) {
+                    _track.collision_mask = value;
+                    Stop();
+                    Reset();
+                }
+            }
+        }
         public bool HasDefaultTrackBackground => _track.HasDefaultBackground;
         public bool HasDefaultTrackLineColor => _track.HasDefaultLineColor;
         public int StartingBGColorR
