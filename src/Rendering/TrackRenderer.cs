@@ -78,8 +78,8 @@ namespace linerider.Rendering
         }
         public void Render(DrawOptions options, bool recording = false)
         {
-            using (new GLEnableCap(EnableCap.Texture2D))
-            {
+            //using (new GLEnableCap(EnableCap.Texture2D))
+            //{
                 UpdateBuffers();
                 GL.BlendFunc(
                     BlendingFactor.SrcAlpha,
@@ -120,7 +120,7 @@ namespace linerider.Rendering
                 _decorator.DrawUnder(options);
                 _physvbo.Draw();
                 GameDrawingMatrix.Exit();
-            }
+            //}
         }
         /// <summary>
         /// Clears the renderer and initializes it with new lines.

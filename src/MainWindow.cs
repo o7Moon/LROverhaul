@@ -182,7 +182,7 @@ namespace linerider
             if (shouldrender)
             {
                 _invalidated = false;
-                BeginOrtho();
+                //BeginOrtho();
                 if (blend == 1 && Settings.SmoothPlayback && Track.Playing && !Canvas.Scrubbing)
                 {
                     blend = Math.Min(1, (float)Track.Scheduler.ElapsedPercent);
@@ -232,24 +232,24 @@ namespace linerider
 
                 if (Settings.DrawFloatGrid)
                 {
-                    GameRenderer.DrawFloatGrid();
+                    //GameRenderer.DrawFloatGrid();
                 }
 
                 if ((InputUtils.Check(Hotkey.PreferenceDrawDebugGrid) && !TrackRecorder.Recording) || Settings.DrawCollisionGrid)
                 {
-                    GameRenderer.DbgDrawGrid();
+                    //GameRenderer.DbgDrawGrid();
                 }
 
                 if ((InputUtils.Check(Hotkey.PreferenceDrawDebugGrid) && !TrackRecorder.Recording) || Settings.DrawAGWs)
                 {
-                    GameRenderer.DrawAGWs();
+                    //GameRenderer.DrawAGWs();
                 }
 
-                Track.Render(blend);
+                //Track.Render(blend);
 
                 if ((InputUtils.Check(Hotkey.PreferenceDrawDebugCamera) && !TrackRecorder.Recording) || Settings.DrawCamera)
                 {
-                    GameRenderer.DbgDrawCamera();
+                    //GameRenderer.DbgDrawCamera();
                 }
                 
                 Canvas.RenderCanvas();
@@ -257,7 +257,7 @@ namespace linerider
 
                 SwapBuffers();
                 // There are machines and cases where a refresh may not hit the screen without calling glfinish...
-                GL.Finish();
+                //GL.Finish();
                 double seconds = Track.FramerateWatch.Elapsed.TotalSeconds;
                 Track.FramerateCounter.AddFrame(seconds);
                 Track.FramerateWatch.Restart();

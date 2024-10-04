@@ -83,7 +83,7 @@ namespace Gwen.Renderer
             // Create the opengl texture
             GL.GenTextures(1, out int glTex);
 
-            int prevtex = GL.GetInteger(GetPName.Texture2D);
+            int prevtex = GL.GetInteger(GetPName.TextureBinding2D);
             GL.BindTexture(TextureTarget.Texture2D, glTex);
             m_LastTextureID = glTex;
 
@@ -123,7 +123,7 @@ namespace Gwen.Renderer
                 GL.GetFloat(GetPName.AlphaTestRef, out m_PrevAlphaRef);
 
                 m_WasBlendEnabled = GL.IsEnabled(EnableCap.Blend);
-                m_WasTexture2DEnabled = GL.IsEnabled(EnableCap.Texture2D);
+                //m_WasTexture2DEnabled = GL.IsEnabled(EnableCap.Texture2D);
                 m_WasDepthTestEnabled = GL.IsEnabled(EnableCap.DepthTest);
             }
 
@@ -132,7 +132,7 @@ namespace Gwen.Renderer
             GL.AlphaFunc(AlphaFunction.Greater, 1.0f);
             GL.Enable(EnableCap.Blend);
             GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.Texture2D);
+            //GL.Disable(EnableCap.Texture2D);
 
             VertexCount = 0;
             DrawCallCount = 0;
@@ -154,7 +154,7 @@ namespace Gwen.Renderer
             if (m_TextureEnabled)
             {
                 Flush();
-                GL.Disable(EnableCap.Texture2D);
+                //GL.Disable(EnableCap.Texture2D);
                 m_TextureEnabled = false;
             }
 
@@ -183,7 +183,7 @@ namespace Gwen.Renderer
 
             if (!m_TextureEnabled)
             {
-                GL.Enable(EnableCap.Texture2D);
+                //GL.Enable(EnableCap.Texture2D);
                 m_TextureEnabled = true;
             }
 
@@ -209,7 +209,7 @@ namespace Gwen.Renderer
 
             if (!m_TextureEnabled)
             {
-                GL.Enable(EnableCap.Texture2D);
+                //GL.Enable(EnableCap.Texture2D);
                 m_TextureEnabled = true;
             }
 
@@ -239,7 +239,7 @@ namespace Gwen.Renderer
                     GL.Disable(EnableCap.Blend);
 
                 if (m_WasTexture2DEnabled && !m_TextureEnabled)
-                    GL.Enable(EnableCap.Texture2D);
+                    //GL.Enable(EnableCap.Texture2D);
 
                 if (m_WasDepthTestEnabled)
                     GL.Enable(EnableCap.DepthTest);

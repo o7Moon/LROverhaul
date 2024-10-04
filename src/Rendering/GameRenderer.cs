@@ -117,8 +117,8 @@ namespace linerider.Rendering
         {
             using (new GLEnableCap(EnableCap.Blend))
             {
-                using (new GLEnableCap(EnableCap.Texture2D))
-                {
+                //using (new GLEnableCap(EnableCap.Texture2D))
+                //{
                     GameDrawingMatrix.Enter();
                     LineVAO vao = GetLineVAO();
                     vao.Scale = GameDrawingMatrix.Scale;
@@ -126,15 +126,15 @@ namespace linerider.Rendering
                     vao.knobstate = knobs ? (redknobs ? (int)KnobState.LifeLock : (int)KnobState.Shown) : (int)KnobState.Hidden;
                     vao.Draw(PrimitiveType.Triangles);
                     GameDrawingMatrix.Exit();
-                }
+                //}
             }
         }
         public static void RenderRoundedRectangle(DoubleRect rect, Color color, float thickness, bool gamecoords = true)
         {
             using (new GLEnableCap(EnableCap.Blend))
             {
-                using (new GLEnableCap(EnableCap.Texture2D))
-                {
+                //using (new GLEnableCap(EnableCap.Texture2D))
+                //{
                     if (gamecoords)
                         GameDrawingMatrix.Enter();
                     LineVAO vao = GetLineVAO();
@@ -151,7 +151,7 @@ namespace linerider.Rendering
                     vao.Draw(PrimitiveType.Triangles);
                     if (gamecoords)
                         GameDrawingMatrix.Exit();
-                }
+                //}
             }
         }
         public static void DbgDrawCamera()

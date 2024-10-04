@@ -101,7 +101,7 @@ namespace linerider.Rendering
             buf.AddVertex(new GenericVertex((Vector2)tr, c, u2, v1));
             buf.AddVertex(new GenericVertex((Vector2)br, c, u2, v2));
             buf.AddVertex(new GenericVertex((Vector2)bl, c, u1, v2));
-            using (new GLEnableCap(EnableCap.Texture2D))
+            //using (new GLEnableCap(EnableCap.Texture2D))
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.BindTexture(TextureTarget.Texture2D, tex);

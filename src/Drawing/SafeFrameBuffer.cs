@@ -44,7 +44,8 @@ namespace linerider.Drawing
                 // This can fail for any number of reasons
                 string[] version = GL.GetString(StringName.Version).Split('.');
                 int major = int.Parse(version[0]);
-                int minor = int.Parse(version[1]);
+                // cut it off after a space in case the string looks something like "4.6 mesa (...)" like it does on my system
+                int minor = int.Parse(version[1].Split(' ')[0]);
                 _version = new Version(major, minor);
                 System.Diagnostics.Debug.WriteLine("Using OpenGL Version " + _version);
             }
