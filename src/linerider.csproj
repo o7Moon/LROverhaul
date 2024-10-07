@@ -29,7 +29,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\build</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>7</LangVersion>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />

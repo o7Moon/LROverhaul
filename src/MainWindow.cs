@@ -182,7 +182,7 @@ namespace linerider
             if (shouldrender)
             {
                 _invalidated = false;
-                //BeginOrtho();
+                BeginOrtho();
                 if (blend == 1 && Settings.SmoothPlayback && Track.Playing && !Canvas.Scrubbing)
                 {
                     blend = Math.Min(1, (float)Track.Scheduler.ElapsedPercent);
@@ -225,7 +225,7 @@ namespace linerider
                     Constants.TriggerLineColorChange = Settings.Computed.LineColor;
                 }
 
-                MSAABuffer.Use(RenderSize.Width, RenderSize.Height);
+                MSAABuffer.Use(FramebufferSize.X, FramebufferSize.Y);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Enable(EnableCap.Blend);
@@ -422,7 +422,7 @@ namespace linerider
             Track.Camera.OnResize();
             try
             {
-                Canvas.SetCanvasSize(RenderSize.Width, RenderSize.Height);
+                Canvas.SetCanvasSize(FramebufferSize.X, FramebufferSize.Y);
             }
             catch (Exception ex)
             {
@@ -748,12 +748,13 @@ namespace linerider
             if (RenderSize.Height > 0 && RenderSize.Width > 0)
             {
                 //GL.Viewport(new Rectangle(0, 0, RenderSize.Width, RenderSize.Height));
-                GL.Viewport(0, 0, RenderSize.Width, RenderSize.Height);
-                GL.MatrixMode(MatrixMode.Projection);
-                GL.LoadIdentity();
-                GL.Ortho(0, RenderSize.Width, RenderSize.Height, 0, 0, 1);
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadIdentity();
+                GL.Viewport(0, 0, FramebufferSize.X, FramebufferSize.Y);
+                Canvas.Renderer.Ortho = Matrix4.Mult(Matrix4.CreateOrthographic(FramebufferSize.X, -FramebufferSize.Y, 0, 1), Matrix4.CreateTranslation(-1f, 1f, 0));
+                //GL.MatrixMode(MatrixMode.Projection);
+                //GL.LoadIdentity();
+                //GL.Ortho(0, RenderSize.Width, RenderSize.Height, 0, 0, 1);
+                //GL.MatrixMode(MatrixMode.Modelview);
+                //GL.LoadIdentity();
             }
         }
         private void RegisterHotkeys()
