@@ -477,12 +477,19 @@ namespace Gwen.Renderer
         const string RectangleFragSource = 
         """
         #version 330 core
+        in vec2 UV;
         uniform vec4 in_color;
+        uniform sampler2D tex;
+        uniform bool use_tex;
         out vec4 color;
         
         void main()
         {
-            color = in_color;
+            if (use_tex) {
+                color = texture(tex, UV) * in_color;
+            } else {
+                color = in_color;
+            }
         }
         """;
         const string RectangleVertSource = 
@@ -491,11 +498,14 @@ namespace Gwen.Renderer
         layout (location = 0) in vec2 position;
         layout (location = 1) in vec2 uv;
 
+        out vec2 UV;
+
         uniform mat4 ortho_matrix;
         
         void main()
         {
             gl_Position = ortho_matrix * vec4(position, 0.0, 1.0);
+            UV = uv;
         }
         """;
 
@@ -535,6 +545,11 @@ namespace Gwen.Renderer
                 return GL.GetUniformLocation(RectangleShader, "ortho_matrix");
             }
         }
+        int TexEnabledUniform {
+            get {
+                return GL.GetUniformLocation(RectangleShader, "use_tex");
+            }
+        }
 
         int? _rectangle_vbo = null;
         int RectangleVbo { 
@@ -569,45 +584,7 @@ namespace Gwen.Renderer
 
         private void DrawRect(Rectangle rect, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
         {
-            //Console.WriteLine($"{rect.X} {rect.Y}, {rect.Width} {rect.Height}");
-            GL.BindVertexArray(RectangleVao);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, RectangleVbo);
-            float[] verts = new float[16]{
-            //  x, y, u, v,
-                rect.X, rect.Y, u1, v1,
-                rect.X + rect.Width, rect.Y, u2, v1,
-                rect.X, rect.Y + rect.Height, u1, v2, 
-                rect.X + rect.Width, rect.Y + rect.Height, u2, v2,
-            };
-            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * verts.Length, verts, BufferUsageHint.StreamDraw);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, RectangleEbo);
-            byte[] indices = new byte[6] {
-                0, 1, 2,
-                2, 1, 3,
-            };
-            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(byte) * 6, indices, BufferUsageHint.StreamDraw);
-
-            // position
-            GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 0);
-            // uv
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
-
-            GL.UseProgram(RectangleShader);
-
-            GL.Uniform4(ColorUniform, m_Color.R / 255.0f, m_Color.G / 255.0f, m_Color.B / 255.0f, m_Color.A / 255.0f);
-            GL.UniformMatrix4(OrthoUniform, false, ref Ortho);
-
-            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedByte, 0);
-            
-            return;
-            if (VertexCount + 4 >= MaxVerts)
-            {
-                Flush();
-            }
             rect.Width = Math.Max(0, rect.Width);
             rect.Height = Math.Max(0, rect.Height);
 
@@ -682,6 +659,46 @@ namespace Gwen.Renderer
 
                     u2 -= du * (u2 - u1);
                 }
+            }
+            
+            GL.BindVertexArray(RectangleVao);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, RectangleVbo);
+            float[] verts = new float[16]{
+            //  x, y, u, v,
+                rect.X, rect.Y, u1, v1,
+                rect.X + rect.Width, rect.Y, u2, v1,
+                rect.X, rect.Y + rect.Height, u1, v2, 
+                rect.X + rect.Width, rect.Y + rect.Height, u2, v2,
+            };
+            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * verts.Length, verts, BufferUsageHint.StreamDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, RectangleEbo);
+            byte[] indices = new byte[6] {
+                0, 1, 2,
+                2, 1, 3,
+            };
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(byte) * 6, indices, BufferUsageHint.StreamDraw);
+
+            // position
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 0);
+            // uv
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
+
+            GL.UseProgram(RectangleShader);
+
+            GL.Uniform4(ColorUniform, m_Color.R / 255.0f, m_Color.G / 255.0f, m_Color.B / 255.0f, m_Color.A / 255.0f);
+            GL.UniformMatrix4(OrthoUniform, false, ref Ortho);
+            GL.Uniform1(TexEnabledUniform, m_TextureEnabled ? 1 : 0);
+
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedByte, 0);
+            
+            return;
+            if (VertexCount + 4 >= MaxVerts)
+            {
+                Flush();
             }
 
             int vertexIndex = VertexCount;

@@ -44,6 +44,8 @@ namespace linerider.UI.Widgets
         }
         protected override void Render(Gwen.Skin.SkinBase skin)
         {
+            // TODO implement in modern opengl
+            return;
             ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
             float rotation = Environment.TickCount % 1000 / 1000f;
             Vector3d trans = new Vector3d(X + Width / 2, Y + Height / 2, 0);
