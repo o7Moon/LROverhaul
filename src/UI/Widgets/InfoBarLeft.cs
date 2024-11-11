@@ -64,7 +64,26 @@ namespace linerider.UI.Widgets
                 {
                     bool hasChanges = _editor.TrackChanges > 0;
                     string name = hasChanges ? $"{_editor.Name} *" : _editor.Name;
-                    return name;
+                    string remountstate; 
+                    switch (_editor.Timeline.GetFrame(_editor.Offset).remountState) {
+                        case 0:
+                            remountstate = "MOUNTED";
+                            break;
+                        case 1:
+                            remountstate = "DISMOUNTING";
+                            break;
+                        case 2:
+                            remountstate = "DISMOUNTED";
+                            break;
+                        case 3:
+                            remountstate = "REMOUNTING";
+                            break;
+                        default:
+                            remountstate = "???";
+                            break;
+                    }
+                    string remounttimer = _editor.Timeline.GetFrame(_editor.Offset).remountTimer.ToString();
+                    return name + $"\n{remountstate} {remounttimer}";
                 },
             };
 
