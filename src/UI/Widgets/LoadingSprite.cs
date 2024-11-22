@@ -1,3 +1,5 @@
+// GL3TODO: implement the loading spinner
+
 //  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //

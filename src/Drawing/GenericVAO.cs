@@ -1,3 +1,5 @@
+// GL3TODO: i dont think this needs to be kept, seems like deprecated gl1.0 stuff 
+
 //  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
@@ -16,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using OpenTK.Graphics.OpenGL;
+/*using OpenTK.Graphics.OpenGL;
 using System;
 
 namespace linerider.Drawing
@@ -53,4 +55,4 @@ namespace linerider.Drawing
             GL.DisableClientState(ArrayCap.VertexArray);
         }
     }
-}
+}*/

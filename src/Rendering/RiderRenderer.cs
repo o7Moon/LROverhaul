@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: implement the rider renderer
+
+/*using linerider.Drawing;
 using linerider.Drawing.RiderModel;
 using linerider.Game;
 using linerider.Utils;
@@ -503,4 +505,4 @@ namespace linerider.Rendering
             }
         }
     }
-}
+}*/

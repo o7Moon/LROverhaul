@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: calls out to the track and rider renderers, handles onion skinning
+
+/*using linerider.Drawing;
 using linerider.Game;
 using linerider.IO;
 using linerider.Tools;
@@ -107,4 +109,4 @@ namespace linerider.Rendering
         public void RemoveLine(GameLine l) => _trackrenderer.RemoveLine(l);
         public void RefreshTrack(Track track) => _trackrenderer.InitializeTrack(track);
     }
-}
+}*/

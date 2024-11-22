@@ -1,4 +1,6 @@
-﻿//  Author:
+﻿// GL3TODO: handle transform matrix uniforms
+
+//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
@@ -16,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using OpenTK;
+/*using OpenTK;
 using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 namespace linerider.Rendering
@@ -54,4 +56,4 @@ namespace linerider.Rendering
             return screen;
         }
     }
-}
+}*/

@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: draws the color playback underlay
+
+/* using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK;
@@ -81,4 +83,4 @@ namespace linerider.Rendering
             return LineRenderer.CreateTrackLine(line.Position1 + slant, line.Position2 + slant, 2, Utility.ColorToRGBA_LE(color));
         }
     }
-}
+}*/

@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: draws simlines and some othe lines like momentum vectors. split simlines into their own renderer and have a simpler line shader for everything else.
+
+/*using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK;
@@ -287,4 +289,4 @@ namespace linerider.Rendering
             return ret;
         }
     }
-}
+}*/

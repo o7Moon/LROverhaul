@@ -1,4 +1,6 @@
-﻿//  Author:
+﻿// GL3TODO: seems like it would be better as multiple classes, renders many things
+
+//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
@@ -16,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using linerider.Drawing;
+/*using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK;
@@ -552,4 +554,4 @@ namespace linerider.Rendering
             }
         }
     }
-}
+}*/

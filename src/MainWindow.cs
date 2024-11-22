@@ -162,6 +162,7 @@ namespace linerider
         public bool ShouldXySnap() => Settings.Editor.ForceXySnap || InputUtils.CheckPressed(Hotkey.ToolXYSnap);
         public void Render(float blend = 1)
         {
+            // GL3TODO: reimpl this method alongside the new renderer bits
             if (Settings.LockTrackDuration && Track.Playing && !TrackRecorder.Recording)
             {
                 if (Track.Offset >= Canvas.TrackDuration)
@@ -745,6 +746,7 @@ namespace linerider
 
         private void BeginOrtho()
         {
+            // GL3TODO: maybe not necessary
             if (RenderSize.Height > 0 && RenderSize.Width > 0)
             {
                 //GL.Viewport(new Rectangle(0, 0, RenderSize.Width, RenderSize.Height));

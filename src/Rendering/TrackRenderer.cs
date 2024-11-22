@@ -1,4 +1,6 @@
-﻿//  Author:
+﻿// GL3TODO: calls line renderers
+
+//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
@@ -16,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using linerider.Drawing;
+/*using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK.Graphics.OpenGL;
@@ -354,4 +356,4 @@ namespace linerider.Rendering
             return lineverts;
         }
     }
-}
+}*/

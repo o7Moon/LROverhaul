@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: draws the red line accel flags
+
+/*using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK;
@@ -314,4 +316,4 @@ namespace linerider.Rendering
             return ret;
         }
     }
-}
+}*/

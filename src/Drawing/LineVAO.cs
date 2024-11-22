@@ -1,3 +1,5 @@
+// GL3TODO: will probably be completely different with the new line shaders
+
 //  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
@@ -16,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using linerider.Rendering;
+/*using linerider.Rendering;
 using linerider.Utils;
 using OpenTK;
 using OpenTK.Mathematics;
@@ -98,4 +100,4 @@ namespace linerider.Drawing
             _shader.Stop();
         }
     }
-}
+}*/

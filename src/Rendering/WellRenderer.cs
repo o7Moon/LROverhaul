@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: generates and draws geometry for line hitboxes
+
+/* using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK;
@@ -137,4 +139,4 @@ namespace linerider.Rendering
                 };
         }
     }
-}
+}*/

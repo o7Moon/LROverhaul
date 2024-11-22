@@ -1,3 +1,5 @@
+// GL3TODO: figure out if new renderer will use this
+
 //  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //

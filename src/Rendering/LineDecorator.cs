@@ -1,4 +1,6 @@
-using linerider.Drawing;
+// GL3TODO: calls the color plackback, line accel, and line hitbox renderers
+
+/*using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using System;
@@ -83,4 +85,4 @@ namespace linerider.Rendering
             _lineaccelrenderer.Dispose();
         }
     }
-}
+}*/

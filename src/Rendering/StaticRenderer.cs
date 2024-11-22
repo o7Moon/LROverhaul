@@ -1,4 +1,6 @@
-﻿//  Author:
+﻿// GL3TODO: used to render textures but also has seemingly unrelated helper methods ????
+
+//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
@@ -16,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using linerider.Drawing;
+/*using linerider.Drawing;
 using linerider.Utils;
 using OpenTK;
 using OpenTK.Mathematics;
@@ -157,7 +159,7 @@ namespace linerider.Rendering
 
                 /*case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
                     lock_format = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
-                    break;*/
+                    break;*//*
 
                 default:
                     throw new Exception("Failed to load texture");
@@ -232,4 +234,4 @@ namespace linerider.Rendering
             GL.End();
         }
     }
-}
+}*/
