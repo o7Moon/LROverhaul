@@ -160,6 +160,35 @@ namespace linerider
         }
 
         public bool ShouldXySnap() => Settings.Editor.ForceXySnap || InputUtils.CheckPressed(Hotkey.ToolXYSnap);
+
+        int? _test_vao = null;
+        int? _test_vbo = null;
+        public int TestVao {
+            get {
+                if (_test_vao == null) {
+                    _test_vao = GL.GenVertexArray();
+                    GL.BindVertexArray((int)_test_vao);
+                    GL.EnableVertexAttribArray(0);
+
+                    _test_vbo = GL.GenBuffer();
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, (int)_test_vbo);
+                    float[] verts = new float[9]{
+                        -10f, -10f, 0.0f,
+                        10f, -10f, 0.0f,
+                        0.0f,  10f, 0.0f
+                    };
+                    GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * verts.Length, verts, BufferUsageHint.StaticDraw);
+
+                    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(float) * 3, 0);
+                }
+                return (int)_test_vao;
+            }
+        }
+        public int TestVbo {
+            get {
+                return (int)_test_vbo;
+            }
+        }
         public void Render(float blend = 1)
         {
             // GL3TODO: reimpl this method alongside the new renderer bits
@@ -195,6 +224,7 @@ namespace linerider
                 {
                     Track.Camera.BeginFrame(blend, Track.Zoom);
                 }
+                CameraMatrixUniform.UpdateCamera(RenderSize, (Vector2)ScreenTranslation, Track.Zoom);
                 if (Track.Playing && CurrentTools.PencilTool.Active)
                 {
                     CurrentTools.PencilTool.OnMouseMoved(InputUtils.GetMouse());
@@ -230,6 +260,10 @@ namespace linerider
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Enable(EnableCap.Blend);
+
+                Shaders._testshader.Use();
+                GL.BindVertexArray(TestVao);
+                GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
                 if (Settings.DrawFloatGrid)
                 {

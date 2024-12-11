@@ -92,7 +92,7 @@ namespace linerider.Game.LineGenerator
 
         public override void Generate_Internal(TrackWriter trk) // Generates the line
         {
-            MainWindow game = GameRenderer.Game;
+            //MainWindow game = GameRenderer.Game;
             int fr = overrideFrame ? frame : game.Track.Offset;
             int it = overrideIteration ? iteration : game.Track.IterationsOffset;
             Rider rider = game.Track.Timeline.GetFrame(fr, it);

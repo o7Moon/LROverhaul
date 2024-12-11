@@ -222,6 +222,7 @@ namespace linerider.Tools
         /// <returns>a sorted array of lines where 0 is the closest point</returns>
         public GameLine[] LinesInRadius(TrackWriter trk, Vector2d position, double rad)
         {
+            return null;/*
             SortedList<int, GameLine> lines = new SortedList<int, GameLine>();
             IEnumerable<GameLine> inrect =
                 trk.GetLinesInRect(new DoubleRect(position - new Vector2d(24, 24), new Vector2d(24 * 2, 24 * 2)),
@@ -265,7 +266,7 @@ namespace linerider.Tools
             {
                 ret[i] = lines.Values[lines.Count - 1 - i];
             }
-            return lines.Values.ToArray();
+            return lines.Values.ToArray();*/
         }
         /// <summary>
         /// Gets line ends near the point by radius.

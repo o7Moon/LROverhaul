@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 
 namespace linerider
@@ -45,7 +46,7 @@ namespace linerider
         private bool _renderriderinvalid = true;
         private RiderFrame _renderrider = null;
         private readonly ResourceSync _tracksync = new ResourceSync();
-        public SimulationRenderer _renderer = new SimulationRenderer();
+        //public SimulationRenderer _renderer = new SimulationRenderer();
         private bool _refreshtrack = false;
         private Vector2d _savedcamera;
         private float _savedzoom;
@@ -137,11 +138,11 @@ namespace linerider
                     Stop();
                     Reset();
                     StandardLine.Zone = _track.GravityWellSize;
-                    _renderer.RefreshTrack(_track);
+                    //_renderer.RefreshTrack(_track);
                 }
             }
         }
-        public bool NeedsDraw => _renderer.RequiresUpdate || _refreshtrack || _renderriderinvalid || _invalidated;
+        public bool NeedsDraw => /*_renderer.RequiresUpdate ||*/ _refreshtrack || _renderriderinvalid || _invalidated;
         public bool ZeroStart
         {
             get => _track.ZeroStart;
@@ -338,7 +339,7 @@ namespace linerider
             {
                 using (_tracksync.AcquireRead())
                 {
-                    _renderer.RefreshTrack(_track);
+                    //_renderer.RefreshTrack(_track);
                 }
                 _refreshtrack = false;
             }
@@ -399,14 +400,16 @@ namespace linerider
                 {
                     if (_track.LineLookup.TryGetValue(change, out GameLine line))
                     {
-                        _renderer.RedrawLine(line);
+                        //_renderer.RedrawLine(line);
                     }
                 }
             }
 
-            _renderer.Render(_track, Timeline, Camera, drawOptions);
+            //_renderer.Render(_track, Timeline, Camera, drawOptions);
         }
-        public void RedrawLine(GameLine line) => _renderer.RedrawLine(line);
+        public void RedrawLine(GameLine line) {
+            return;
+        }//_renderer.RedrawLine(line);
         public void RedrawAllLines()
         {
             foreach (KeyValuePair<int, GameLine> entry in _track.LineLookup)
@@ -887,7 +890,7 @@ namespace linerider
                 game.Canvas.Loading = false;
             }
         }
-        public TrackWriter CreateTrackWriter() => TrackWriter.AcquireWrite(_tracksync, _track, _renderer, UndoManager, Timeline, _cells);
+        public TrackWriter CreateTrackWriter() => TrackWriter.AcquireWrite(_tracksync, _track, /*_renderer,*/ UndoManager, Timeline, _cells);
         public TrackReader CreateTrackReader() => TrackReader.AcquireRead(_tracksync, _track, _cells);
 
         public RiderFrame Flag => _flag;

@@ -44,6 +44,14 @@ namespace linerider.Drawing
                 return _floatgridshader;
             }
         }
+        public static Shader _testshader = null;
+        public static Shader TestShader {
+            get {
+                if (!_initialized)
+                    Load();
+                return _testshader;
+            }
+        }
 
         private static bool _initialized = false;
         public static void Load()
@@ -51,7 +59,10 @@ namespace linerider.Drawing
             if (!_initialized)
             {
                 _initialized = true;
-                _lineshader = new Shader(
+                _testshader = new Shader(
+                    GameResources.test_vert,
+                    GameResources.test_frag);
+                /*_lineshader = new Shader(
                     GameResources.simline_vert,
                     GameResources.simline_frag);
                 _ridershader = new Shader(
@@ -62,7 +73,7 @@ namespace linerider.Drawing
                     GameResources.simgrid_frag);
                 _floatgridshader = new Shader(
                     GameResources.floatgrid_vert,
-                    GameResources.floatgrid_frag);
+                    GameResources.floatgrid_frag);*/
             }
         }
     }

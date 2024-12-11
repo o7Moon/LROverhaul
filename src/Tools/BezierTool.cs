@@ -91,7 +91,7 @@ namespace linerider.Tools
             double closestDist = 100000;
             for (int i = 0; i < controlPoints.Count; i++)
             {
-                double dist = GameRenderer.Distance(ScreenToGameCoords(pos), controlPoints[i]);
+                double dist = 1; //GameRenderer.Distance(ScreenToGameCoords(pos), controlPoints[i]);
                 if (dist < closestDist)
                 {
                     closestDist = dist;
@@ -124,7 +124,7 @@ namespace linerider.Tools
             double closestDist = 100000;
             for (int i = 0; i < controlPoints.Count; i++)
             {
-                double dist = GameRenderer.Distance(ScreenToGameCoords(pos), controlPoints[i]);
+                double dist = 1;//GameRenderer.Distance(ScreenToGameCoords(pos), controlPoints[i]);
                 if (dist < closestDist)
                 {
                     closestDist = dist;
@@ -238,6 +238,7 @@ namespace linerider.Tools
         }
         private void RenderDirect()
         {
+            return;/*
             _ = GameRenderer.GenerateBezierCurve2d(controlPoints.ToArray(), Settings.Bezier.Resolution, out BezierCurve curve);
             switch (Swatch.Selected)
             {
@@ -250,10 +251,11 @@ namespace linerider.Tools
                 case LineType.Acceleration:
                     GameRenderer.RenderPoints(controlPoints, curve, Settings.Colors.AccelerationLine, NodeSize, NodeThickness);
                     break;
-            }
+            }*/
         }
         private void RenderTrace()
         {
+            return;/*
             switch (Swatch.Selected)
             {
                 case LineType.Standard:
@@ -265,7 +267,7 @@ namespace linerider.Tools
                 case LineType.Acceleration:
                     GameRenderer.RenderPoints(controlPoints, Settings.Colors.AccelerationLine, NodeSize, NodeThickness);
                     break;
-            }
+            }*/
         }
         private void FinalizePlacement()
         {
@@ -281,6 +283,7 @@ namespace linerider.Tools
         }
         private void PlaceLines(TrackWriter trk, bool preview)
         {
+            return;/*
             if (controlPoints.Count > 1)
             {
                 List<Vector2> curvePoints = GameRenderer.GenerateBezierCurve(controlPoints.ToArray(), Settings.Bezier.Resolution).ToList();
@@ -301,7 +304,7 @@ namespace linerider.Tools
                 if (!preview)
                     game.Track.UndoManager.EndAction();
             }
-            game.Invalidate();
+            game.Invalidate();*/
         }
         private void DeleteLines()
         {

@@ -339,22 +339,22 @@ namespace linerider.Tools
             return corner;
         }
         private void RenderFilledCorner(DoubleRect box, bool top, bool left)
-        {
+        {/*
             DoubleRect corner = GetCorner(box, top, left);
             DoubleRect rect = new DoubleRect(
                 GameDrawingMatrix.ScreenCoordD(corner.Vector),
                 new Vector2d(corner.Width * game.Track.Zoom,
                 corner.Height * game.Track.Zoom));
-            GameRenderer.RenderRoundedRectangle(rect, Color.CornflowerBlue, 5, false);
+            GameRenderer.RenderRoundedRectangle(rect, Color.CornflowerBlue, 5, false);*/
         }
         private void RenderCorner(DoubleRect box, bool top, bool left)
-        {
+        {/*
             DoubleRect corner = GetCorner(box, top, left);
             DoubleRect rect = new DoubleRect(
                 GameDrawingMatrix.ScreenCoordD(corner.Vector),
                 new Vector2d(corner.Width * game.Track.Zoom,
                 corner.Height * game.Track.Zoom));
-            GameRenderer.RenderRoundedRectangle(rect, Color.CornflowerBlue, 2, false);
+            GameRenderer.RenderRoundedRectangle(rect, Color.CornflowerBlue, 2, false);*/
         }
         public override void Render()
         {
@@ -363,7 +363,7 @@ namespace linerider.Tools
                 Color color = Color.FromArgb(255, 0x00, 0x77, 0xcc);
                 if (_selectionbox != DoubleRect.Empty)
                 {
-                    GameRenderer.RenderRoundedRectangle(_selectionbox, color, 2f / game.Track.Zoom);
+                    //GameRenderer.RenderRoundedRectangle(_selectionbox, color, 2f / game.Track.Zoom);
                     RenderCorner(_selectionbox, true, true);
                     RenderCorner(_selectionbox, false, false);
                     RenderCorner(_selectionbox, true, false);
@@ -371,7 +371,7 @@ namespace linerider.Tools
                     if (_hoverscale)
                         RenderFilledCorner(_selectionbox, _nodetop, _nodeleft);
                 }
-                if (_drawbox != DoubleRect.Empty)
+                /*if (_drawbox != DoubleRect.Empty)
                     GameRenderer.RenderRoundedRectangle(_drawbox, color, 2f / game.Track.Zoom);
                 if (_hoverline != null)
                 {
@@ -379,7 +379,7 @@ namespace linerider.Tools
 
                     GameRenderer.DrawKnob(_hoverline.Position1, _snapknob1, false, _hoverline.Width, _snapknob1 && !_snapknob2 ? 1 : 0);
                     GameRenderer.DrawKnob(_hoverline.Position2, _snapknob2, false, _hoverline.Width, _snapknob2 && !_snapknob1 ? 1 : 0);
-                }
+                }*/
             }
             base.Render();
         }

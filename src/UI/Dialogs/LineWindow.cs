@@ -416,15 +416,15 @@ namespace linerider.UI
                 if (origLineType == LineType.Standard && mul != 0)
                 {
                     redCpy = RedLine.CloneFromBlue((StandardLine)_ownerline);
-                    _editor._renderer.RedrawLine(_ownerline);
-                    _editor._renderer.AddLine(redCpy);
+                    //_editor._renderer.RedrawLine(_ownerline);
+                    //_editor._renderer.AddLine(redCpy);
                 }
                 // If setting acceleration to 0 of a red line
                 else if (origLineType == LineType.Acceleration && mul == 0)
                 {
-                    _editor._renderer.RemoveLine(_ownerline);
+                    //_editor._renderer.RemoveLine(_ownerline);
                     blueCpy = StandardLine.CloneFromRed((RedLine)_ownerline);
-                    _editor._renderer.AddLine(blueCpy);
+                    //_editor._renderer.AddLine(blueCpy);
                 }
                 else
                 {

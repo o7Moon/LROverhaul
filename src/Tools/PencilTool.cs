@@ -144,7 +144,7 @@ namespace linerider.Tools
             base.Render();
             if (DrawingScenery && _mouseshadow != Vector2d.Zero && !game.Track.Playing)
             {
-                GameRenderer.RenderRoundedLine(_mouseshadow, _mouseshadow, Color.FromArgb(100, Settings.Colors.SceneryLine), 2f * Swatch.GreenMultiplier, false, false);
+                //GameRenderer.RenderRoundedLine(_mouseshadow, _mouseshadow, Color.FromArgb(100, Settings.Colors.SceneryLine), 2f * Swatch.GreenMultiplier, false, false);
             }
         }
         public override void Cancel() => Stop();

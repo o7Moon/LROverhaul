@@ -164,7 +164,7 @@ namespace linerider.Tools
                     float sz = 2f;
                     if (Swatch.Selected == LineType.Scenery)
                         sz *= Swatch.GreenMultiplier;
-                    GameRenderer.RenderRoundedLine(_start, _end, c, sz);
+                    //GameRenderer.RenderRoundedLine(_start, _end, c, sz);
                 }
                 else
                 {
@@ -173,7 +173,7 @@ namespace linerider.Tools
                         case LineType.Standard:
                             StandardLine sl = new StandardLine(_start, _end, _addflip);
                             sl.CalculateConstants();
-                            GameRenderer.DrawTrackLine(sl, c, Settings.Editor.RenderGravityWells, true);
+                            //GameRenderer.DrawTrackLine(sl, c, Settings.Editor.RenderGravityWells, true);
                             break;
 
                         case LineType.Acceleration:
@@ -182,11 +182,11 @@ namespace linerider.Tools
                                 Multiplier = Swatch.RedMultiplier
                             };
                             rl.CalculateConstants();
-                            GameRenderer.DrawTrackLine(rl, c, Settings.Editor.RenderGravityWells, true);
+                            //GameRenderer.DrawTrackLine(rl, c, Settings.Editor.RenderGravityWells, true);
                             break;
 
                         case LineType.Scenery:
-                            GameRenderer.RenderRoundedLine(_start, _end, c, 2 * Swatch.GreenMultiplier);
+                            //GameRenderer.RenderRoundedLine(_start, _end, c, 2 * Swatch.GreenMultiplier);
                             break;
                     }
                 }

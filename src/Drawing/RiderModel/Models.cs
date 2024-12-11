@@ -50,14 +50,14 @@ namespace linerider.Drawing.RiderModel
 
         public static void SetSprites(SKBitmap body_img, SKBitmap bodydead_img, SKBitmap sled_img, SKBitmap sledbroken_img, SKBitmap arm_img, SKBitmap leg_img)
         {
-            BodyTexture = StaticRenderer.LoadTexture(body_img);
-            BodyDeadTexture = StaticRenderer.LoadTexture(bodydead_img);
+            //BodyTexture = StaticRenderer.LoadTexture(body_img);
+            //BodyDeadTexture = StaticRenderer.LoadTexture(bodydead_img);
 
-            SledTexture = StaticRenderer.LoadTexture(sled_img);
-            SledBrokenTexture = StaticRenderer.LoadTexture(sledbroken_img);
+            //SledTexture = StaticRenderer.LoadTexture(sled_img);
+            //SledBrokenTexture = StaticRenderer.LoadTexture(sledbroken_img);
 
-            ArmTexture = StaticRenderer.LoadTexture(arm_img);
-            LegTexture = StaticRenderer.LoadTexture(leg_img);
+            //ArmTexture = StaticRenderer.LoadTexture(arm_img);
+            //LegTexture = StaticRenderer.LoadTexture(leg_img);
         }
 
         public static void SetRope(double thickness, Color color)

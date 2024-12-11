@@ -189,6 +189,8 @@ namespace linerider
         internal static string simgrid_vert => GetString("shaders.simgrid.vert");
         internal static string floatgrid_vert => GetString("shaders.floatgrid.vert");
         internal static string floatgrid_frag => GetString("shaders.floatgrid.frag");
+        internal static string test_vert => GetString("shaders.test.vert");
+        internal static string test_frag => GetString("shaders.test.frag");
         #endregion
         #region Resources: Icons
         internal static VectorResource icon_tool_pencil => GetVectorImage("icons.tool_pencil.svg");

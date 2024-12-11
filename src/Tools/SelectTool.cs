@@ -350,7 +350,7 @@ namespace linerider.Tools
             int linealpha = both ? 64 : 48;
             if (selected && both)
                 linealpha += 16;
-            GameRenderer.RenderRoundedLine(
+            /*GameRenderer.RenderRoundedLine(
                 start,
                 end,
                 Color.FromArgb(linealpha, Color.FromArgb(127, 127, 127)),
@@ -358,7 +358,7 @@ namespace linerider.Tools
 
             bool canlifelock = CanLifelock && line.Type != LineType.Scenery;
             GameRenderer.DrawKnob(start, knob1, canlifelock, width, hoverratio);
-            GameRenderer.DrawKnob(end, knob2, canlifelock, width, hoverratio);
+            GameRenderer.DrawKnob(end, knob2, canlifelock, width, hoverratio);*/
 
         }
         private void DropLine()

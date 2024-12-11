@@ -42,6 +42,7 @@ namespace linerider.Addons
 
         public static void CoordsUpdate()
         {
+            return;/*
             MainWindow game = GameRenderer.Game;
             frame = game.Track.Offset;
             iteration = game.Track.IterationsOffset;
@@ -53,10 +54,10 @@ namespace linerider.Addons
                 CoordsY[i] = rider.Body[i].Location.Y;
 
                 CoordsData[i] = ConPName[i] + ": " + CoordsX[i].ToString("G17") + "X " + CoordsY[i].ToString("G17") + "Y";
-            }
+            }*/
         }
         public static void SaveToClipboard()
-        {
+        {return; /*
             MainWindow game = GameRenderer.Game;
             frame = game.Track.Offset;
             iteration = game.Track.IterationsOffset;
@@ -67,7 +68,7 @@ namespace linerider.Addons
                     game.Clipboard = rider.Body[integerClipboard].Location.X.ToString("G17");
                 if (yClipboard)
                     game.Clipboard = rider.Body[integerClipboard].Location.Y.ToString("G17");
-            }
+            }*/
         }
     };
 }

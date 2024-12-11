@@ -37,7 +37,7 @@ namespace linerider
         private bool _updateextensions = true;
         private UndoManager _undo;
         private Timeline _timeline;
-        private SimulationRenderer _renderer;
+        //private SimulationRenderer _renderer;
         /// <summary>
         /// Gets or sets the track name
         /// </summary>
@@ -67,13 +67,13 @@ namespace linerider
         public static TrackWriter AcquireWrite(
             ResourceSync sync,
             Track track,
-            SimulationRenderer renderer,
+            //SimulationRenderer renderer,
             UndoManager undo,
             Timeline timeline,
             EditorGrid cells) => new TrackWriter(sync.AcquireWrite(), track)
             {
                 _undo = undo,
-                _renderer = renderer,
+                //renderer = renderer,
                 _timeline = timeline,
                 _editorcells = cells
             };
@@ -99,7 +99,7 @@ namespace linerider
 
             Track.AddLine(line);
             _editorcells.AddLine(line);
-            _renderer.AddLine(line);
+            //_renderer.AddLine(line);
             RegisterUndoAction(null, line);
             if (_updateextensions && line is StandardLine stl)
                 AddExtensions(stl);
@@ -137,8 +137,8 @@ namespace linerider
                 _editorcells.AddLine(line);
 
                 RegisterUndoAction(clone, line);
-                if (render)
-                    _renderer.RedrawLine(line);
+                //if (render)
+                    //_renderer.RedrawLine(line);
             }
         }
         /// <summary>
@@ -173,7 +173,7 @@ namespace linerider
             _editorcells.AddLine(newline);
 
             Track.LineLookup[newline.ID] = newline;
-            if (oldline.Type != newline.Type)
+            /*if (oldline.Type != newline.Type)
             {
                 _renderer.RemoveLine(oldline);
                 _renderer.AddLine(newline);
@@ -181,7 +181,7 @@ namespace linerider
             else
             {
                 _renderer.RedrawLine(newline);
-            }
+            }*/
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace linerider
             RegisterUndoAction(line, null);
             Track.RemoveLine(line);
             _editorcells.RemoveLine(line);
-            _renderer.RemoveLine(line);
+            //_renderer.RemoveLine(line);
         }
         private void AddExtensions(StandardLine input) => UpdateExtensions(input, true);
         private void RemoveExtensions(StandardLine input) => UpdateExtensions(input, false);
