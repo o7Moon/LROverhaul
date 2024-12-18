@@ -343,9 +343,14 @@ namespace linerider.Game
             }
         }
 
-        public static unsafe void ProcessBones(Bone[] bones, SimulationPoint[] body, ref bool dead, ref int rState, ref int rTimer, List<int> breaks = null)
+        public static unsafe void ProcessBones(Bone[] bones, SimulationPoint[] body, ref bool dead, ref int rState, ref int rTimer, List<int> breaks = null, int subiteration_cutoff = -1)
         {
             int bonelen = bones.Length;
+
+            if (subiteration_cutoff >= 0)
+            {
+                bonelen = subiteration_cutoff + 1;
+            }
 
             for (int i = 0; i < bonelen; i++)
             {
@@ -411,7 +416,8 @@ namespace linerider.Game
             LinkedList<int> collisions,
             int maxiteration = 6,
             bool stepscarf = true,
-            int frameid = 0)
+            int frameid = 0,
+            int subiteration = 21)
         {
             SimulationPoint[] body = Body.Step();
             _ = Body.Length;
@@ -424,8 +430,9 @@ namespace linerider.Game
             {
                 for (int i = 0; i < maxiteration; i++)
                 {
-                    ProcessBones(bones, body, ref dead, ref rState, ref rTimer);
-                    ProcessLines(grid, body, ref phys, collisions);
+                    ProcessBones(bones, body, ref dead, ref rState, ref rTimer, null, (i >= maxiteration - 1) ? subiteration : -1);
+                    if (!(subiteration < 21 && (i >= maxiteration - 1)))
+                        ProcessLines(grid, body, ref phys, collisions);
                 }
             }
             if (maxiteration == 6)
@@ -508,7 +515,8 @@ namespace linerider.Game
         public List<int> Diagnose(
             ISimulationGrid grid,
             Bone[] bones,
-            int maxiteration = 6)
+            int maxiteration = 6,
+            int subiteration = 21)
         {
             List<int> ret = new List<int>();
             if (Crashed)
@@ -526,7 +534,7 @@ namespace linerider.Game
             {
                 for (int i = 0; i < maxiteration; i++)
                 {
-                    ProcessBones(bones, body, ref dead, ref rState, ref rTimer, breaks);
+                    ProcessBones(bones, body, ref dead, ref rState, ref rTimer, breaks, (i == maxiteration - 1) ? subiteration : -1);
                     if (dead)
                     {
                         return breaks;

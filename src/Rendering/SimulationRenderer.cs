@@ -94,7 +94,7 @@ namespace linerider.Rendering
             }
             if (options.ShowContactLines)
             {
-                _riderrenderer.DrawContacts(options.Rider, options.RiderDiagnosis, 1);
+                _riderrenderer.DrawContacts(options.Rider, options.RiderDiagnosis, 1, options.SubIteration);
             }
             _riderrenderer.Scale = options.Zoom;
             _riderrenderer.Draw();

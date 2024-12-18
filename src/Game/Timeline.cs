@@ -117,24 +117,24 @@ namespace linerider.Game
         /// <summary>
         /// Extracts the rider and death details of the specified frame.
         /// </summary>
-        public RiderFrame ExtractFrame(int frame, int iteration = 6)
+        public RiderFrame ExtractFrame(int frame, int iteration = 6, int subiteration = 21)
         {
             Rider rider;
             List<int> diagnosis = null;
             using (_track.Grid.Sync.AcquireRead())
             {
-                diagnosis = DiagnoseFrame(frame, iteration);
-                rider = GetFrame(frame, iteration);
+                diagnosis = DiagnoseFrame(frame, iteration, subiteration);
+                rider = GetFrame(frame, iteration, subiteration);
             }
-            return new RiderFrame(frame, rider, diagnosis, iteration);
+            return new RiderFrame(frame, rider, diagnosis, iteration, subiteration);
         }
         /// <summary>
         /// Gets an up to date diagnosis state for the frame, recomputing if
         /// necessary.
         /// </summary>
-        public List<int> DiagnoseFrame(int frame, int iteration = 6)
+        public List<int> DiagnoseFrame(int frame, int iteration = 6, int subiteration = 21)
         {
-            bool isiteration = iteration != 6 && frame > 0;
+            bool isiteration = (iteration != 6 || subiteration != 21) && frame > 0;
             frame = isiteration ? frame - 1 : frame;
             Rider next = GetFrame(frame + 1);
             Rider rider = GetFrame(frame);
@@ -143,7 +143,24 @@ namespace linerider.Game
                 : rider.Diagnose(
                     _track.Grid,
                     _track.Bones,
-                    Math.Min(6, iteration + 1));
+                    Math.Min(6, iteration + 1), subiteration);
+        }
+        /// <summary>
+        /// Gets an up to date rider state for the frame, recomputing if
+        /// necessary.
+        /// </summary>
+        public Rider GetFrame(int frame, int iteration = 6, int subiteration = 21)
+        {
+            _ = iteration != 6 && frame > 0;
+            return (iteration != 6 || subiteration != 21) && frame > 0
+                ? GetFrame(frame - 1).Simulate(
+                    _track.Grid,
+                    _track.Bones,
+                    null,
+                    iteration,
+                    frameid: frame,
+                    subiteration: subiteration)
+                : GetFrame(frame);
         }
         /// <summary>
         /// Gets an up to date rider state for the frame, recomputing if

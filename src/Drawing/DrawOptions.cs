@@ -19,6 +19,7 @@ namespace linerider.Drawing
         public bool ShowContactLines = false;
         public bool ShowMomentumVectors = false;
         public int Iteration = 6;
+        public int SubIteration = 21;
         public float Zoom;
         public int OverlayFrame = -1;
         public bool IsRunning => !Paused;

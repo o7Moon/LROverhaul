@@ -133,6 +133,8 @@ namespace linerider.UI.Widgets
             AddBinding(playbackTable, "Frame Previous", Hotkey.PlaybackFramePrev);
             AddBinding(playbackTable, "Iteration Next", Hotkey.PlaybackIterationNext);
             AddBinding(playbackTable, "Iteration Previous", Hotkey.PlaybackIterationPrev);
+            AddBinding(playbackTable, "Subiteration Next", Hotkey.PlaybackSubIterationNext);
+            AddBinding(playbackTable, "Subiteration Previous", Hotkey.PlaybackSubIterationPrev);
             AddBinding(playbackTable, "Hold -- Forward", Hotkey.PlaybackForward);
             AddBinding(playbackTable, "Hold -- Rewind", Hotkey.PlaybackBackward);
             AddBinding(playbackTable, "Increase Playback Rate", Hotkey.PlaybackSpeedUp);

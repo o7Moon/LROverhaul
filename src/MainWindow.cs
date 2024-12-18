@@ -1093,6 +1093,63 @@ namespace linerider
             },
             null,
             repeat: true);
+            InputUtils.RegisterHotkey(Hotkey.PlaybackSubIterationNext, () => !Track.Playing, () =>
+            {
+                if (Settings.LockTrackDuration && (Track.Offset >= Canvas.TrackDuration && Track.IterationsOffset == 6 && Track.SubIterationOffset == 21))
+                    return;
+                
+                StopTools();
+
+                if (Track.SubIterationOffset != 21)
+                    Track.SubIterationOffset++;
+                else
+                {
+                    Track.SubIterationOffset = 0;
+                    if (Track.IterationsOffset != 6)
+                    {
+                        Track.IterationsOffset++;
+                    }
+                    else
+                    {
+                        Track.NextFrame();
+                        Track.IterationsOffset = 0;
+                        Track.UpdateCamera();
+                    }
+                }
+                Track.InvalidateRenderRider();
+            });
+            InputUtils.RegisterHotkey(Hotkey.PlaybackSubIterationPrev, () => !Track.Playing, () =>
+            {
+                if (Track.Offset == 0)
+                    return;
+
+                StopTools();
+
+                if (Track.IterationsOffset == 0)
+                {
+                    Track.PreviousFrame();
+                    Track.IterationsOffset = 6;
+                    Invalidate();
+                    Track.UpdateCamera();
+                } else if (Track.SubIterationOffset > 0)
+                    Track.SubIterationOffset--;
+                else
+                {
+                    Track.SubIterationOffset = 21;
+                    if (Track.IterationsOffset > 0)
+                    {
+                        Track.IterationsOffset--;
+                    }
+                    else
+                    {
+                        Track.PreviousFrame();
+                        Track.IterationsOffset = 6;
+                        Invalidate();
+                        Track.UpdateCamera();
+                    }
+                }
+                Track.InvalidateRenderRider();
+            });
             InputUtils.RegisterHotkey(Hotkey.PlaybackResetCamera, () => true, () => Track.ResetCamera());
             InputUtils.RegisterHotkey(Hotkey.PlaybackStart, () => true, () =>
             {

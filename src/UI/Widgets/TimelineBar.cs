@@ -117,10 +117,16 @@ namespace linerider.UI.Widgets
                 TextRequest = (o, e) =>
                 {
                     int iteration = _editor.IterationsOffset;
-                    if (iteration == 6)
+                    int subiteration = _editor.SubIterationOffset;
+                    if (iteration == 6 && subiteration == 21)
                         return "";
 
                     string label = $"Physics Iteration: {iteration}";
+
+                    if (subiteration != 21)
+                    {
+                        label += $" Subiteration: {subiteration}";
+                    }
 
                     if (iteration == 0)
                         label += " (momentum tick)";

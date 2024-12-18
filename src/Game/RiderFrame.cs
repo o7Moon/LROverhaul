@@ -29,15 +29,17 @@ namespace linerider.Game
         public Rider State;
         public List<int> Diagnosis;
         public int IterationID = 6;
+        public int SubIteration = 21;
         public RiderFrame()
         {
         }
-        public RiderFrame(int frameid, Rider state, List<int> diagnosis, int iterationid)
+        public RiderFrame(int frameid, Rider state, List<int> diagnosis, int iterationid, int subiteration)
         {
             FrameID = frameid;
             State = state;
             Diagnosis = diagnosis;
             IterationID = iterationid;
+            SubIteration = subiteration;
         }
     }
 }

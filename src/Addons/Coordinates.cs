@@ -35,6 +35,7 @@ namespace linerider.Addons
 
         public static int frame;
         public static int iteration;
+        public static int subiteration;
 
         public static bool xClipboard;
         public static bool yClipboard;
@@ -45,7 +46,8 @@ namespace linerider.Addons
             MainWindow game = GameRenderer.Game;
             frame = game.Track.Offset;
             iteration = game.Track.IterationsOffset;
-            Rider rider = game.Track.Timeline.GetFrame(frame, iteration);
+            subiteration = game.Track.SubIterationOffset;
+            Rider rider = game.Track.Timeline.GetFrame(frame, iteration, subiteration);
 
             for (int i = 0; i < ConPName.Length; i++)
             {

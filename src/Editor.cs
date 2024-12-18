@@ -42,6 +42,7 @@ namespace linerider
         private bool _hasflag;
         private Track _track;
         private int _iteration = 6;
+        private int _subiteration = 21;
         private bool _renderriderinvalid = true;
         private RiderFrame _renderrider = null;
         private readonly ResourceSync _tracksync = new ResourceSync();
@@ -277,7 +278,7 @@ namespace linerider
                 if (_renderriderinvalid)
                 {
                     _renderriderinvalid = false;
-                    _renderrider = Timeline.ExtractFrame(Offset, IterationsOffset);
+                    _renderrider = Timeline.ExtractFrame(Offset, IterationsOffset, SubIterationOffset);
                 }
                 return _renderrider;
             }
@@ -310,6 +311,17 @@ namespace linerider
                 if (IterationsOffset > 6 || IterationsOffset < 0)
                     throw new Exception("iteration num out of range");
                 _iteration = value;
+            }
+        }
+
+        public int SubIterationOffset
+        {
+            get => _subiteration;
+            set
+            {
+                if (SubIterationOffset > 21 || SubIterationOffset < 0)
+                    throw new Exception("subiteration num out of range");
+                _subiteration = value;
             }
         }
         public string CurrentNotifyMessage { get; private set; } = "";
@@ -388,6 +400,7 @@ namespace linerider
                 renderframe = Offset - 1;
             }
             drawOptions.Iteration = IterationsOffset;
+            drawOptions.SubIteration = SubIterationOffset;
             // TODO: there's a race condition here where if the track finished 
             // loading between this if statement and the render call above
             // and theres a line change queued, the line may not exist in
@@ -576,6 +589,7 @@ namespace linerider
             Paused = false;
             Offset = frameid;
             IterationsOffset = 6;
+            SubIterationOffset = 21;
 
             game.UpdateCursor();
 
@@ -648,6 +662,7 @@ namespace linerider
             if (frame + 1 > FrameCount)
                 FrameCount = frame + 1;
             IterationsOffset = 6;
+            SubIterationOffset = 21;
             InvalidateRenderRider();
             game.Invalidate();
         }
