@@ -71,6 +71,11 @@ namespace linerider.UI
                       _savebutton.Text = "Save (.trk)";
                       _savebutton.UserData = ".trk";
                   };
+                  pop.AddItem(".lrb (experimental)").Clicked += (o2, e2) =>
+                  {
+                      _savebutton.Text = "Save (.lrb)";
+                      _savebutton.UserData = ".lrb";
+                  };
                   pop.Open(Pos.Center);
               };
             _savebutton.Clicked += (o, e) =>
@@ -148,6 +153,13 @@ namespace linerider.UI
                             Settings.LastSelectedTrack = filepath;
                             Settings.ForceSave();
                         }
+                        break;
+                        case ".lrb":
+                        {
+                            filepath = TrackIO.SaveTrackToLrbFile(trk.Track, filename);
+                            Settings.LastSelectedTrack = filepath;
+                            Settings.ForceSave();
+                        } 
                         break;
                         default:
                             throw new InvalidOperationException("Unknown save filetype");

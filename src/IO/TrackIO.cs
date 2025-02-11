@@ -18,6 +18,7 @@
 
 using linerider.Game;
 using linerider.IO.json;
+using linerider.IO.lrb;
 using linerider.Utils;
 using Newtonsoft.Json;
 using System;
@@ -39,7 +40,8 @@ namespace linerider.IO
         public static string[] EnumerateTrackFiles(string folder) => Directory.GetFiles(folder, "*.*")
                 .Where(x =>
                     x.EndsWith(".trk", StringComparison.OrdinalIgnoreCase) ||
-                    x.EndsWith(".json", StringComparison.OrdinalIgnoreCase)).
+                    x.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
+                    x.EndsWith(".lrb", StringComparison.OrdinalIgnoreCase)).
                     OrderByDescending(x =>
                     {
                         string fn = Path.GetFileName(x);
@@ -215,6 +217,9 @@ namespace linerider.IO
                         case ".sol": //.sol
                             _ = SaveToSOL(track, quicksaveString);
                             break;
+                        case ".lrb": //.lrb
+                            _ = SaveTrackToLrbFile(track, quicksaveString);
+                            break;
                     }
                 }
                 catch (Exception e)
@@ -281,6 +286,15 @@ namespace linerider.IO
             track.Filename = filename;
             return filename;
         }
+
+        public static string SaveTrackToLrbFile(Track track, string savename)
+        {
+            int saveindex = GetSaveIndex(track);
+            string filename = LRBWriter.SaveTrack(track, saveindex + " " + savename);
+            track.Filename = filename;
+            return filename;
+        }
+
         public static string SaveTrackToJsonFile(Track track, string savename)
         {
             int saveindex = GetSaveIndex(track);
@@ -327,6 +341,9 @@ namespace linerider.IO
                     break;
                 case ".sol":
                     _ = SOLWriter.SaveTrack(track, autosaveString);
+                    break;
+                case ".lrb":
+                    _ = LRBWriter.SaveTrack(track, autosaveString);
                     break;
             }
         }

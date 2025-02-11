@@ -1121,6 +1121,7 @@ namespace linerider.UI
 
             ComboBox defaultSaveType = GwenHelper.CreateLabeledCombobox(savesGroup, "Default Save As Format:");
             _ = defaultSaveType.AddItem(".trk", "", ".trk");
+            _ = defaultSaveType.AddItem(".lrb", "", ".lrb");
             _ = defaultSaveType.AddItem(".json", "", ".json");
             _ = defaultSaveType.AddItem(".sol", "", ".sol");
             defaultSaveType.ItemSelected += (o, e) =>
@@ -1131,6 +1132,7 @@ namespace linerider.UI
 
             ComboBox defaultQuicksaveType = GwenHelper.CreateLabeledCombobox(savesGroup, "Default Quicksave Format:");
             _ = defaultQuicksaveType.AddItem(".trk", "", ".trk");
+            _ = defaultQuicksaveType.AddItem(".lrb", "", ".lrb");
             _ = defaultQuicksaveType.AddItem(".json", "", ".json");
             _ = defaultQuicksaveType.AddItem(".sol", "", ".sol");
             defaultQuicksaveType.ItemSelected += (o, e) =>
@@ -1141,6 +1143,7 @@ namespace linerider.UI
 
             ComboBox defaultAutosaveType = GwenHelper.CreateLabeledCombobox(savesGroup, "Default Autosave Format:");
             _ = defaultAutosaveType.AddItem(".trk", "", ".trk");
+            _ = defaultAutosaveType.AddItem(".lrb", "", ".lrb");
             _ = defaultAutosaveType.AddItem(".json", "", ".json");
             _ = defaultAutosaveType.AddItem(".sol", "", ".sol");
             defaultAutosaveType.SelectByUserData(Settings.DefaultAutosaveFormat);
@@ -1152,6 +1155,7 @@ namespace linerider.UI
 
             ComboBox defaultCrashBackupType = GwenHelper.CreateLabeledCombobox(savesGroup, "Default Crash Backup Format:");
             _ = defaultCrashBackupType.AddItem(".trk", "", ".trk");
+            _ = defaultCrashBackupType.AddItem(".lrb", "", ".lrb");
             _ = defaultCrashBackupType.AddItem(".json", "", ".json");
             _ = defaultCrashBackupType.AddItem(".sol", "", ".sol");
             defaultCrashBackupType.SelectByUserData(Settings.DefaultCrashBackupFormat);

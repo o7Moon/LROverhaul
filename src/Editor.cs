@@ -848,6 +848,18 @@ namespace linerider
                     }
                 }
                 else if (string.Equals(
+                        Path.GetExtension(lasttrack),
+                        ".lrb",
+                        StringComparison.InvariantCultureIgnoreCase))
+                {
+                    string trackname = TrackIO.GetTrackName(lasttrack);
+                    lock (LoadSync)
+                    {
+                        Track track = LRBLoader.LoadTrack(lasttrack, trackname);
+                        ChangeTrack(track);
+                    }
+                }
+                else if (string.Equals(
                     Path.GetExtension(lasttrack),
                     ".json",
                     StringComparison.InvariantCultureIgnoreCase))

@@ -318,7 +318,7 @@ namespace linerider.UI
                         ? TRKLoader.LoadTrack(file, name)
                         : file.EndsWith(".json", StringComparison.InvariantCultureIgnoreCase)
                             ? JSONLoader.LoadTrack(file)
-                            : throw new Exception("Filetype unknown");
+                            : file.EndsWith(".lrb", StringComparison.OrdinalIgnoreCase) ? LRBLoader.LoadTrack(file, name) : throw new Exception("Filetype unknown");
                     _editor.ChangeTrack(track);
                     Settings.LastSelectedTrack = file;
                     Settings.Save();
