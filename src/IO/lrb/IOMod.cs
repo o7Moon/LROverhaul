@@ -5,8 +5,8 @@ namespace linerider.IO.lrb
         /// <summary>
         /// Read info from the track and create an entry to be added to the track file for this mod.
         /// </summary>
-        /// <returns>a new <see cref="Modtable.Entry"/> to be written into the track file</returns>
-        public abstract Modtable.Entry WriteEntry(Track track);
+        /// <returns>a new <see cref="Modtable.Entry"/> to be written into the track file, or null if the mod doesn't need to be written (see <see cref="ModRegistry.register"/>).</returns>
+        public abstract Modtable.Entry? WriteEntry(Track track);
         /// <summary>
         /// Read info from an entry for this mod and apply the changes to the track.
         /// </summary>

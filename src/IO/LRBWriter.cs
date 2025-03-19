@@ -15,8 +15,12 @@ namespace linerider.IO.lrb
                 _ = Directory.CreateDirectory(dir);
             string filename = Path.Combine(dir, savename + ".lrb");
             List<Modtable.Entry> mods = new List<Modtable.Entry>();
-            mods.Add(ModRegistry.SimlineMod.IoMod.WriteEntry(trk));
-            mods.Add(ModRegistry.LabelMod.IoMod.WriteEntry(trk));
+            foreach(ModRegistry.ModRegistryEntry mod in ModRegistry.CheckTrackMods)
+            {
+                if (mod.IoMod == null) continue;
+                var entry = mod.IoMod.WriteEntry(trk);
+                if (entry != null) mods.Add(entry);
+            }
             Modtable modtable = new Modtable(Modtable.EXPECTED_LRB_VERSION, mods.ToArray());
             using (FileStream file = File.Create(filename))
             {

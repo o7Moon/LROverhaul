@@ -10,16 +10,18 @@ namespace linerider.IO.lrb.BuiltinMods
     /// </summary>
     public class base_simline : IOMod
     {
-        public override Modtable.Entry WriteEntry(Track track)
+        public override Modtable.Entry? WriteEntry(Track track)
         {
             var stream = new MemoryStream();
             var bw = new BinaryWriter(stream);
             uint count = 0;
-            // pad with 0
+            // pad with 0, we seek back to this position and write the length after we know how many lines were written
             bw.Write(count);
+            bool any_lines = false;
             foreach (GameLine gline in track.GetLines())
             {
                 if (gline is SceneryLine) continue;
+                any_lines = true;
                 var line = (StandardLine)gline;
                 count++;
                 bw.Write((uint)line.ID);
@@ -36,6 +38,9 @@ namespace linerider.IO.lrb.BuiltinMods
                 bw.Write(line.Position2.X);
                 bw.Write(line.Position2.Y);
             }
+
+            // don't write the mod if there aren't any simlines
+            if (!any_lines) return null;
 
             stream.Seek(0, SeekOrigin.Begin);
             bw.Write(count);

@@ -1,3 +1,4 @@
+using linerider.Utils;
 using System;
 using System.Text;
 using System.IO;
@@ -16,9 +17,11 @@ namespace linerider.IO.lrb.BuiltinMods
             track.Name = Encoding.UTF8.GetString(utf8);
         }
 
-        public override Modtable.Entry WriteEntry(Track track)
+        public override Modtable.Entry? WriteEntry(Track track)
         {
             var label = track.Name;
+            // we don't really need to write the label mod if it's just the default name
+            if (label == Constants.InternalDefaultTrackName) return null;
             var labelbytes = Encoding.UTF8.GetBytes(label);
             if (labelbytes.Length > ushort.MaxValue)
             {
