@@ -27,9 +27,9 @@ namespace linerider.IO.lrb
         /// <summary>
         /// Helper function to create a default modtable entry from this object's info and optional extra parameters.
         /// </summary>
-        public Modtable.Entry CreateEntry(byte[]? bytes = null, string? optionalmessage = null)
+        public Modtable.Entry CreateEntry(byte[]? bytes = null, Modtable.modflags flags = 0)
         {
-            return new Modtable.Entry(name: ModName, modVersion: ModVersion, modData: bytes, optionalMessage: optionalmessage);
+            return new Modtable.Entry(name: ModName, modVersion: ModVersion, modData: bytes, flags: flags);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace linerider.IO.lrb.BuiltinMods
             bw.Write(track.StartOffset.X);
             bw.Write(track.StartOffset.Y);
             bw.Flush();
-            var entry = CreateEntry(bytes, "contains the start offset, physics will be very wrong if missing");
+            var entry = CreateEntry(bytes, Modtable.modflags.physics);
             return entry;
         }
         public override string ModName { get => "base.startoffset"; }

@@ -7,7 +7,7 @@ namespace linerider.IO.lrb.BuiltinMods
     {
         public override Modtable.Entry? WriteEntry(Track track)
         {
-            if (track.ZeroStart) return CreateEntry(optionalmessage: "indicates zero start is enabled, physics will be wrong if missing");
+            if (track.ZeroStart) return CreateEntry();
             // omit if not enabled
             return null;
         }

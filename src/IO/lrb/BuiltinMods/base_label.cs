@@ -33,7 +33,7 @@ namespace linerider.IO.lrb.BuiltinMods
             bw.Write(length);
             bw.Write(labelbytes);
             bw.Flush();
-            var entry = CreateEntry(bytes, "contains the track's name, only really necessary for displaying in an editor.");
+            var entry = CreateEntry(bytes);
             return entry;
         }
         public override string ModName { get => "base.label"; }

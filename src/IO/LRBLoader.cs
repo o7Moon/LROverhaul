@@ -28,13 +28,14 @@ namespace linerider.IO
                 IOMod? reader_impl = ModRegistry.FindMatchingMod(entry);
                 if (reader_impl == null)
                 {
-                    if (entry.OptionalMessage != null)
+                    if (entry.ModFlags.HasFlag(Modtable.modflags.required))
                     {
-                        // TODO handle optional mods
+                        throw new TrackIO.TrackLoadException(
+                            $"could not find implementation for mod {entry.ModName} version {entry.ModVersion}, which is required to load the track.");
                     }
                     else
                     {
-                        throw new TrackIO.TrackLoadException($"could not find implementation for mod {entry.ModName} version {entry.ModVersion}, which is required to load the track.");
+                        // TODO handle optional mods
                     }
                     continue;
                 }

@@ -19,14 +19,14 @@ namespace linerider.IO.lrb
             public readonly string ModName;
             public readonly ushort ModVersion;
             public byte[]? ModData;
-            public readonly string? OptionalMessage;
+            public modflags ModFlags;
 
-            public Entry(string name, ushort modVersion, byte[]? modData, string? optionalMessage)
+            public Entry(string name, ushort modVersion, byte[]? modData, modflags flags = 0)
             {
                 this.ModName = name;
                 this.ModVersion = modVersion;
                 this.ModData = modData;
-                this.OptionalMessage = optionalMessage;
+                this.ModFlags = flags;
             }
         }
 
@@ -38,9 +38,9 @@ namespace linerider.IO.lrb
         }
 
         [Flags]
-        enum modflags : byte
+        public enum modflags : byte
         {
-            optional = 1 << 0,
+            required = 1 << 0,
             physics = 1 << 1,
             camera = 1 << 2,
             scenery = 1 << 3,
@@ -87,15 +87,8 @@ namespace linerider.IO.lrb
                         data = br.ReadBytes((int)data_len);
                         file.Position = current_seek;
                     }
-                    bool includes_optional = flags.HasFlag(modflags.optional);
-                    string? optional_string = null;
-                    if (includes_optional)
-                    {
-                        byte len = br.ReadByte();
-                        optional_string = Encoding.UTF8.GetString(br.ReadBytes(len));
-                    }
 
-                    entries[i] = new Entry(name, modversion, data, optional_string);
+                    entries[i] = new Entry(name, modversion, data);
                 }
                 modtable = new Modtable(version, entries);
 
@@ -125,12 +118,8 @@ namespace linerider.IO.lrb
                 bw.Write(Encoding.UTF8.GetBytes(e.ModName));
                 
                 bw.Write(e.ModVersion);
-                
+
                 modflags flags = 0;
-                if (e.OptionalMessage != null)
-                {
-                    flags |= modflags.optional;
-                }
 
                 if (e.ModData != null)
                 {
@@ -145,12 +134,6 @@ namespace linerider.IO.lrb
                     // pad with zero for now
                     bw.Write((UInt64)0);
                     bw.Write((UInt64)0);
-                }
-                
-                if (e.OptionalMessage != null)
-                {
-                    bw.Write((byte)e.OptionalMessage.Length);
-                    bw.Write(Encoding.UTF8.GetBytes(e.OptionalMessage));
                 }
             }
 

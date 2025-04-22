@@ -47,7 +47,7 @@ namespace linerider.IO.lrb.BuiltinMods
 
             bw.Flush();
 
-            var entry = CreateEntry(stream.ToArray(), "contains simulation lines, which won't be present if mod is missing");
+            var entry = CreateEntry(stream.ToArray(), Modtable.modflags.physics | Modtable.modflags.scenery);
             return entry;
         }
 

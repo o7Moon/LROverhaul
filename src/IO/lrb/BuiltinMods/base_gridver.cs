@@ -32,8 +32,8 @@ namespace linerider.IO.lrb.BuiltinMods
         {
             // 6.2 is assumed if the mod is omitted
             if (track.GetVersion() == 62) return null;
-            if (track.GetVersion() == 61) return CreateEntry(new byte[]{(byte)grid_version.six1}, "indicates grid version 6.1, physics might be incorrect if missing");
-            if (track.GetVersion() == 60) return CreateEntry(new byte[]{(byte)grid_version.six0}, "indicates grid version 6.0, physics might be incorrect if missing");
+            if (track.GetVersion() == 61) return CreateEntry(new byte[]{(byte)grid_version.six1}, Modtable.modflags.physics);
+            if (track.GetVersion() == 60) return CreateEntry(new byte[]{(byte)grid_version.six0}, Modtable.modflags.physics);
             // shouldn't be able to reach here, don't write a mod that is invalid
             return null;
         }
