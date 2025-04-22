@@ -38,7 +38,6 @@ namespace linerider.IO.lrb
         {
             register(new base_label(), true);
             register(new base_gridver(), true);
-            register(new base_zerostart(), true);
             register(new base_simline(), true);
             register(new base_scnline(), true);
             register(new base_startoffset(), true);
