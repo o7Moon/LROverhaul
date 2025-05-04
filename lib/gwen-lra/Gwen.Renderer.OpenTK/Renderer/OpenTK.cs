@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -26,6 +27,8 @@ namespace Gwen.Renderer
             get => m_Color;
             set => m_Color = value;
         }
+
+        public Matrix4 Ortho;
 
         public int VertexCount { get; private set; }
 
@@ -129,22 +132,14 @@ namespace Gwen.Renderer
 
             // Set default values and enable/disable caps.
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.AlphaFunc(AlphaFunction.Greater, 1.0f);
             GL.Enable(EnableCap.Blend);
             GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.Texture2D);
 
             VertexCount = 0;
             DrawCallCount = 0;
             m_ClipEnabled = false;
             m_TextureEnabled = false;
             m_LastTextureID = -1;
-
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.EnableClientState(ArrayCap.ColorArray);
-            GL.EnableClientState(ArrayCap.TextureCoordArray);
-            GL.PushMatrix();
-            GL.Scale(Scale, Scale, 1);
         }
 
         public override void Dispose() => base.Dispose();
@@ -233,7 +228,6 @@ namespace Gwen.Renderer
 
                 // Restore the previous parameter values.
                 GL.BlendFunc((BlendingFactor)m_PrevBlendSrc, (BlendingFactor)m_PrevBlendDst);
-                GL.AlphaFunc((AlphaFunction)m_PrevAlphaFunc, m_PrevAlphaRef);
 
                 if (!m_WasBlendEnabled)
                     GL.Disable(EnableCap.Blend);
@@ -244,17 +238,14 @@ namespace Gwen.Renderer
                 if (m_WasDepthTestEnabled)
                     GL.Enable(EnableCap.DepthTest);
             }
-
-            GL.DisableClientState(ArrayCap.VertexArray);
-            GL.DisableClientState(ArrayCap.ColorArray);
-            GL.DisableClientState(ArrayCap.TextureCoordArray);
-            GL.PopMatrix();
         }
 
         public override void EndClip() => m_ClipEnabled = false;
 
         public unsafe void Flush()
         {
+            // TODO 
+            return;
             if (VertexCount == 0)
                 return;
 
@@ -469,13 +460,109 @@ namespace Gwen.Renderer
         }
 
         public override void StartClip() => m_ClipEnabled = true;
+        
+        const string RectangleFragSource = 
+            """
+            #version 330 core
+            in vec2 UV;
+            uniform vec4 in_color;
+            uniform sampler2D tex;
+            uniform bool use_tex;
+            out vec4 color;
+
+            void main()
+            {
+                if (use_tex) {
+                    color = texture(tex, UV) * in_color;
+                } else {
+                    color = in_color;
+                }
+            }
+            """;
+        
+        const string RectangleVertSource = 
+            """
+            #version 330 core
+            layout (location = 0) in vec2 position;
+            layout (location = 1) in vec2 uv;
+
+            out vec2 UV;
+
+            uniform mat4 ortho_matrix;
+
+            void main()
+            {
+                gl_Position = ortho_matrix * vec4(position, 0.0, 1.0);
+                UV = uv;
+            }
+            """;
+        
+        int? _rectangle_shader = null;
+        int RectangleShader {
+            get { 
+                if (_rectangle_shader == null) {
+                    _rectangle_shader = GL.CreateProgram();
+
+                    int _frag = GL.CreateShader(ShaderType.FragmentShader);
+                    GL.ShaderSource(_frag, RectangleFragSource);
+                    GL.CompileShader(_frag);
+                    int _vert = GL.CreateShader(ShaderType.VertexShader);
+                    GL.ShaderSource(_vert, RectangleVertSource);
+                    GL.CompileShader(_vert);
+
+                    GL.AttachShader((int)_rectangle_shader, _frag);
+                    GL.AttachShader((int)_rectangle_shader, _vert);
+                    GL.LinkProgram((int)_rectangle_shader);
+                    GL.GetProgram((int)_rectangle_shader, GetProgramParameterName.LinkStatus, out int linkstatus);
+                    if (linkstatus == 0)
+                    {
+                        throw new Exception("Shader program link error: " + GL.GetProgramInfoLog((int)_rectangle_shader));
+                    }
+                    GL.ValidateProgram((int)_rectangle_shader);
+                }
+                return (int)_rectangle_shader;
+            }
+        }
+        
+        int ColorUniform {
+            get {
+                return GL.GetUniformLocation(RectangleShader, "in_color");
+            }
+        }
+        int OrthoUniform {
+            get {
+                return GL.GetUniformLocation(RectangleShader, "ortho_matrix");
+            }
+        }
+        int TexEnabledUniform {
+            get {
+                return GL.GetUniformLocation(RectangleShader, "use_tex");
+            }
+        }
+        
+        int? _rectangle_vbo = null;
+        int RectangleVbo { 
+            get {
+                if (_rectangle_vbo == null) {
+                    _rectangle_vbo = GL.GenBuffer();
+                }
+                return (int)_rectangle_vbo;
+            }
+        }
+        
+        int? _rectangle_vao = null;
+        int RectangleVao { 
+            get {
+                if (_rectangle_vao == null) {
+                    _rectangle_vao = GL.GenVertexArray();
+                    GL.BindVertexArray((int)_rectangle_vao);
+                }
+                return (int)_rectangle_vao;
+            }
+        }
 
         private void DrawRect(Rectangle rect, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
         {
-            if (VertexCount + 4 >= MaxVerts)
-            {
-                Flush();
-            }
             rect.Width = Math.Max(0, rect.Width);
             rect.Height = Math.Max(0, rect.Height);
 
@@ -552,6 +639,33 @@ namespace Gwen.Renderer
                 }
             }
 
+            GL.BindVertexArray(RectangleVao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, RectangleVbo);
+            float[] verts = new float[16]{
+                //  x, y, u, v,
+                rect.X, rect.Y, u1, v1,
+                rect.X + rect.Width, rect.Y, u2, v1,
+                rect.X, rect.Y + rect.Height, u1, v2, 
+                rect.X + rect.Width, rect.Y + rect.Height, u2, v2,
+            };
+            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * verts.Length, verts, BufferUsageHint.StreamDraw);
+            
+            // position
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 0);
+            // uv
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
+            
+            GL.UseProgram(RectangleShader);
+            GL.Uniform4(ColorUniform, m_Color.R / 255f, m_Color.G / 255f, m_Color.B / 255f, m_Color.A / 255f);
+            GL.UniformMatrix4(OrthoUniform, false, ref Ortho);
+            GL.Uniform1(TexEnabledUniform, m_TextureEnabled ? 1 : 0);
+
+            GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+
+            return;
+            // TODO
             int vertexIndex = VertexCount;
             short rectw = (short)rect.Width;
             short recth = (short)rect.Height;

@@ -93,7 +93,7 @@ namespace linerider
         private bool _dragRider;
         private bool _invalidated;
         private Rectangle _previouswindowpos;
-        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.Default, Profile = ContextProfile.Compatability, APIVersion = new Version(3, 2) }) {
+        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.Debug, Profile = ContextProfile.Core, APIVersion = new Version(3, 2) }) {
             Size = new Vector2i(Constants.WindowSize.Width, Constants.WindowSize.Height);
             Location = new Vector2i(
                 (int)Math.Round((double)Constants.ScreenSize.Width / 2 - Size.X / 2),
@@ -112,7 +112,7 @@ namespace linerider
             RegisterHotkeys();
             if (Settings.startWindowMaximized)
                 WindowState = WindowState.Maximized;
-            //GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
+            GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
         }
 
         private static DebugProc DebugMessageDelegate = OnGLDebugMessage;
@@ -407,6 +407,7 @@ namespace linerider
             try
             {
                 Canvas.SetCanvasSize(RenderSize.Width, RenderSize.Height);
+                Canvas.Renderer.Ortho = Matrix4.Mult(Matrix4.CreateOrthographic(RenderSize.Width, -RenderSize.Height, 0, 1), Matrix4.CreateTranslation(-1f, 1f, 0));
             }
             catch (Exception ex)
             {
