@@ -32,6 +32,8 @@ namespace linerider.UI
         private Spinner TenPCX;
         private Spinner TenPCY;
         private Spinner TenPCRotation;
+        
+        private ControlBase PcLineGenOptions;
 
         private ControlBase LineGenOptions;
         private SpinnerG17 LineX1;
@@ -59,6 +61,7 @@ namespace linerider.UI
         private static TenPCGenerator gen_10pc;
         private static LineGenerator gen_Line;
         private static KramualGenerator gen_Kramual;
+        private static PointCenteredLineGenerator gen_pcLine;
 
         private GeneratorType CurrentGenerator
         {
@@ -93,6 +96,7 @@ namespace linerider.UI
                 gen_10pc = new TenPCGenerator("10PC Generator", new Vector2d(1.0, 1.0), 0.0);
                 gen_Line = new LineGenerator("Line Generator", new Vector2d(0, 0), new Vector2d(1, 1), LineType.Acceleration);
                 gen_Kramual = new KramualGenerator("Kramual Generator", new Vector2d(0, 0), LineType.Standard);
+                gen_pcLine = new PointCenteredLineGenerator("Point-Centered Line Generator");
                 CurrentGenerator = GeneratorType.Circle;
             }
 
@@ -164,9 +168,17 @@ namespace linerider.UI
             Populate10pc();
             PopulateLine();
             PopulateKramual();
+            PopulatePcLine();
 
             GeneratorTypeBox = GwenHelper.CreateLabeledCombobox(top, "Generator Type:");
             GeneratorTypeBox.Dock = Dock.Top;
+            MenuItem pcline = GeneratorTypeBox.AddItem("Point-Centered Line", "", GeneratorType.PcLine);
+            pcline.CheckChanged += (o, e) =>
+            {
+                GeneratorOptions.Children.Clear();
+                PcLineGenOptions.Parent = GeneratorOptions;
+                CurrentGenerator = GeneratorType.PcLine;
+            };
             MenuItem kramual = GeneratorTypeBox.AddItem("Kramual", "", GeneratorType.Kramual);
             kramual.CheckChanged += (o, e) =>
             {
@@ -219,6 +231,10 @@ namespace linerider.UI
                 case GeneratorType.Kramual:
                     GeneratorTypeBox.SelectedItem = kramual;
                     KramualGenOptions.Parent = GeneratorOptions;
+                    break;
+                case GeneratorType.PcLine:
+                    GeneratorTypeBox.SelectedItem = pcline;
+                    PcLineGenOptions.Parent = GeneratorOptions;
                     break;
             }
 
@@ -431,6 +447,150 @@ namespace linerider.UI
             _ = GwenHelper.CreateLabeledControl(TenPCOptions, "X Speed", TenPCX);
             _ = GwenHelper.CreateLabeledControl(TenPCOptions, "Y Speed", TenPCY);
             _ = GwenHelper.CreateLabeledControl(TenPCOptions, "Rotation Amount", TenPCRotation);
+        }
+
+        private void PopulatePcLine()
+        {
+            gen_pcLine.setCurrentMoment();
+            PcLineGenOptions = new ControlBase(null)
+            {
+                Margin = Margin.Zero, Dock = Dock.Top, AutoSizeToContents = true
+            };
+
+            var X1 = new Spinner(null)
+            {
+                Min = -30000000000, Max = 300000000000, Value = gen_pcLine.start_bit_offset.X,
+            };
+            X1.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.start_bit_offset.X = (int)X1.Value;
+                gen_pcLine.ReGenerate_Preview();
+            };
+            
+            var Y1 = new Spinner(null)
+            {
+                Min = -30000000000, Max = 300000000000, Value = gen_pcLine.start_bit_offset.Y,
+            };
+            Y1.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.start_bit_offset.Y = (int)Y1.Value;
+                gen_pcLine.ReGenerate_Preview();
+            };
+            
+            var X2 = new Spinner(null)
+            {
+                Min = -30000000000, Max = 300000000000, Value = gen_pcLine.end_bit_offset.X,
+            };
+            X2.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.end_bit_offset.X = (int)X2.Value;
+                gen_pcLine.ReGenerate_Preview();
+            };
+            
+            var Y2 = new Spinner(null)
+            {
+                Min = -30000000000, Max = 300000000000, Value = gen_pcLine.end_bit_offset.Y,
+            };
+            Y2.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.end_bit_offset.Y = (int)Y2.Value;
+                gen_pcLine.ReGenerate_Preview();
+            };
+            
+            var Multiplier = new Spinner(null)
+            {
+                Min = 0,
+                Max = 9999,
+                Value = gen_pcLine.multiplier,
+                IsDisabled = gen_Line.lineType != LineType.Acceleration
+            };
+            Multiplier.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.multiplier = (int)LineMultiplier.Value;
+                gen_pcLine.ReGenerate_Preview();
+            };
+            
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "Start X", X1);
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "Start Y", Y1);
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "End X", X2);
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "End Y", Y2);
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "Acceleration Multiplier", Multiplier);
+            
+            RadioButtonGroup lineTypeRadioGroup = new RadioButtonGroup(PcLineGenOptions)
+            {
+                Dock = Dock.Top,
+                ShouldDrawBackground = false
+            };
+            RadioButton blueType = lineTypeRadioGroup.AddOption("Blue");
+            blueType.IsChecked = true;
+            RadioButton redType = lineTypeRadioGroup.AddOption("Red");
+            redType.IsChecked = false;
+            switch (gen_Line.lineType)
+            {
+                case LineType.Standard:
+                    blueType.Select();
+                    break;
+                case LineType.Acceleration:
+                    redType.Select();
+                    break;
+                default:
+                    break;
+            }
+            
+            Checkbox Inverse = null;
+            
+            blueType.CheckChanged += (o, e) =>
+            {
+                gen_pcLine.lineType = LineType.Standard;
+                gen_pcLine.ReGenerate_Preview();
+                Multiplier.Disable();
+                Inverse.Enable();
+            };
+            redType.CheckChanged += (o, e) =>
+            {
+                gen_pcLine.lineType = LineType.Acceleration;
+                gen_pcLine.ReGenerate_Preview();
+                Multiplier.Enable();
+                Inverse.Enable();
+            };
+            
+            Inverse = GwenHelper.AddCheckbox(PcLineGenOptions, "Invert", gen_pcLine.invert, (o, e) =>
+            {
+                gen_pcLine.invert = ((Checkbox)o).IsChecked;
+                gen_pcLine.ReGenerate_Preview();
+            });
+            
+            var Frame = new Spinner(null)
+            {
+                Min = 1,
+                Max = 300000000000,
+                Value = gen_pcLine.moment.Frame,
+            };
+            Frame.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.setFrame((int)Frame.Value);
+                gen_pcLine.ReGenerate_Preview();
+            };
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "Frame", Frame);
+            
+            var Iteration = new Spinner(null)
+            {
+                Min = 0,
+                Max = 6,
+                Value = gen_pcLine.moment.Iteration,
+            };
+            Iteration.ValueChanged += (o, e) =>
+            {
+                gen_pcLine.setIteration((int)Iteration.Value);
+                gen_pcLine.ReGenerate_Preview();
+            };
+            _ = GwenHelper.CreateLabeledControl(PcLineGenOptions, "Iteration", Iteration);
+            
+            Checkbox AfterSubits = GwenHelper.AddCheckbox(PcLineGenOptions, "After Subiterations", gen_pcLine.after_subiterations,
+                (o, e) =>
+                {
+                    gen_pcLine.after_subiterations = ((Checkbox)o).IsChecked;
+                });
         }
 
         private void PopulateLine()
@@ -848,6 +1008,9 @@ namespace linerider.UI
                 case GeneratorType.Kramual:
                     gen_Kramual.ReGenerate_Preview();
                     break;
+                case GeneratorType.PcLine:
+                    gen_pcLine.ReGenerate_Preview();
+                    break;
             }
         }
         private void Render_Final() // Renders the generator's final lines (which are the ones actually added to the track)
@@ -876,6 +1039,11 @@ namespace linerider.UI
                     gen_Kramual.Generate();
                     gen_Kramual.Finalise();
                     break;
+                case GeneratorType.PcLine:
+                    gen_pcLine.DeleteLines();
+                    gen_pcLine.Generate();
+                    gen_pcLine.Finalise();
+                    break;
             }
         }
         private void Render_Clear() // Clears all lines rendered by the current generator
@@ -895,6 +1063,9 @@ namespace linerider.UI
                     break;
                 case GeneratorType.Kramual:
                     gen_Kramual.DeleteLines();
+                    break;
+                case GeneratorType.PcLine:
+                    gen_pcLine.DeleteLines();
                     break;
             }
         }
