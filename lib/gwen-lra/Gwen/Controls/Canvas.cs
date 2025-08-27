@@ -56,7 +56,7 @@ namespace Gwen.Controls
         /// You can do this by checking NeedsRedraw.
         /// </summary>
         public bool NeedsRedraw { get; set; }
-        public HashSet<Menu> OpenMenus = new HashSet<Menu>();
+        public HashSet<Menu> OpenMenus = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Canvas"/> class.
@@ -70,7 +70,7 @@ namespace Gwen.Controls
             BackgroundColor = Color.White;
             ShouldDrawBackground = false;
 
-            m_DisposeQueue = new List<IDisposable>();
+            m_DisposeQueue = [];
             m_ToolTip = new Tooltip(null)
             {
                 Name = "canvas_tooltip",
@@ -85,7 +85,7 @@ namespace Gwen.Controls
         {
             if (OpenMenus.Count > 0)
             {
-                Menu[] copy = OpenMenus.ToArray();
+                Menu[] copy = [.. OpenMenus];
                 foreach (Menu child in copy)
                 {
                     child.CloseMenus();
@@ -201,8 +201,7 @@ namespace Gwen.Controls
             Layout(false);
 
             // If we didn't have a next tab, cycle to the start.
-            if (NextTab == null)
-                NextTab = FirstTab;
+            NextTab ??= FirstTab;
 
             InputHandler.OnCanvasThink(this);
             HandleTooltip();
@@ -218,7 +217,7 @@ namespace Gwen.Controls
                     if (m_ToolTip.IsHidden)
                     {
                         m_ToolTip.IsHidden = false;
-                        if (Children[Children.Count - 1] != m_ToolTip)
+                        if (Children[^1] != m_ToolTip)
                             m_ToolTip.BringToFront();
                     }
                     if (m_ToolTip.Text != tooltip)

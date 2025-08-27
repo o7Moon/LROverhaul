@@ -16,7 +16,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using linerider.Game;
-using OpenTK;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -45,7 +44,7 @@ namespace linerider
         public static List<CellLocation> GetGridPositions(Vector2d linestart, Vector2d lineend, int gridversion)
         {
             Vector2d diff = lineend - linestart;
-            List<CellLocation> ret = new List<CellLocation>();
+            List<CellLocation> ret = [];
             CellLocation cell = CellInfo(linestart.X, linestart.Y);
             CellLocation gridend = CellInfo(lineend.X, lineend.Y);
 
@@ -59,7 +58,7 @@ namespace linerider
                 p2Y = Math.Max(cell.Y, gridend.Y);
             Rectangle box = Rectangle.FromLTRB(p1X, p1Y, p2X, p2Y);
             Vector2d current = linestart;
-            Vector2d scalar = new Vector2d(1 / diff.Y, 1 / diff.X);
+            Vector2d scalar = new(1 / diff.Y, 1 / diff.X);
             bool xforwards = diff.X > 0;
             bool yforwards = diff.Y > 0;
             if (gridversion == 62)
@@ -85,6 +84,33 @@ namespace linerider
             {
                 ret = GetGridPositions61(linestart, lineend);
             }
+            else if (gridversion == 60)
+            {
+                Vector2d line_normal_unit = diff.Normalized().PerpendicularLeft; // Does not depend on flipped
+                Vector2d line_halfway = 0.5 * new Vector2d(Math.Abs(diff.X), Math.Abs(diff.Y));
+                Vector2d line_midpoint = linestart + diff * 0.5;
+                Vector2d absolute_normal = new(Math.Abs(line_normal_unit.X), Math.Abs(line_normal_unit.Y));
+
+                for (int cell_x = p1X; cell_x <= p2X; cell_x++)
+                {
+                    for (int cell_y = p1Y; cell_y <= p2Y; cell_y++)
+                    {
+                        Vector2d curr_pos = CellSize * new Vector2d(cell_x + 0.5, cell_y + 0.5);
+                        CellLocation next_cell_pos = CellInfo(curr_pos.X, curr_pos.Y);
+                        Vector2d dist_between_centers = line_midpoint - curr_pos;
+                        double dist_from_cell_center = Vector2d.Dot(absolute_normal, next_cell_pos.Remainder);
+                        double cell_overlap_into_hitbox = Vector2d.Dot(new Vector2d(dist_from_cell_center, dist_from_cell_center), absolute_normal);
+                        double norm_dist_between_centers = Vector2d.Dot(line_normal_unit, dist_between_centers);
+                        double dist_from_line = Math.Abs(norm_dist_between_centers * line_normal_unit.X) + Math.Abs(norm_dist_between_centers * line_normal_unit.Y);
+                        if (line_halfway.X + next_cell_pos.Remainder.X >= Math.Abs(dist_between_centers.X)
+                            && line_halfway.Y + next_cell_pos.Remainder.Y >= Math.Abs(dist_between_centers.Y)
+                            && cell_overlap_into_hitbox >= dist_from_line)
+                        {
+                            ret.Add(next_cell_pos);
+                        }
+                    }
+                }
+            }
             return ret;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +124,7 @@ namespace linerider
         private static List<CellLocation> GetGridPositions61(Vector2d start, Vector2d end)
         {
             Vector2d diff = end - start;
-            List<CellLocation> ret = new List<CellLocation>();
+            List<CellLocation> ret = [];
             CellLocation cell = CellInfo(start.X, start.Y);
             CellLocation gridend = CellInfo(end.X, end.Y);
 
