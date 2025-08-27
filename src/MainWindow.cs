@@ -105,7 +105,7 @@ namespace linerider
         private bool _invalidated;
         private Rectangle _previouswindowpos;
 
-        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.Debug, Profile = ContextProfile.Core, APIVersion = new Version(3, 2) })
+        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.Debug, Profile = ContextProfile.Core, APIVersion = new Version(3, 3) })
         {
             Size = new Vector2i(Constants.WindowSize.Width, Constants.WindowSize.Height);
             Location = new Vector2i(
