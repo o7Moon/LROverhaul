@@ -30,6 +30,7 @@ namespace linerider.Rendering
     {
         public static MainWindow Game;
         private static LineVAO _linevao = null;
+        private static GenericVAO _gvao = null;
 
         public static void DrawTrackLine(StandardLine line, Color color, bool drawwell, bool drawcolor)
         {
@@ -41,8 +42,10 @@ namespace linerider.Rendering
                 {
                     verts.AddRange(LineAccelRenderer.GetAccelDecor(redline));
                 }
+
                 lv.AddRange(LineColorRenderer.CreateDecorationLine(line, line.Color));
             }
+
             lv.AddRange(
                 LineRenderer.CreateTrackLine(
                     line.Start,
@@ -53,34 +56,49 @@ namespace linerider.Rendering
             {
                 verts.AddRange(WellRenderer.GetWell(line));
             }
+
             LineVAO vao = GetLineVAO();
             vao.Scale = Game.Track.Zoom;
             foreach (LineVertex v in lv.unsafe_array)
             {
                 vao.AddVertex(v);
             }
+
             GameDrawingMatrix.Enter();
             using (new GLEnableCap(EnableCap.Blend))
             {
                 if (verts.Count != 0)
                 {
-                    GenericVAO gvao = new();
+                    GenericVAO gvao = GetGenericVAO();
+                    gvao.Clear();
                     foreach (GenericVertex v in verts.unsafe_array)
                     {
                         gvao.AddVertex(v);
                     }
+
                     gvao.Draw(PrimitiveType.Triangles);
                 }
+
                 vao.Draw(PrimitiveType.Triangles);
             }
+
             GameDrawingMatrix.Exit();
         }
+
+        public static GenericVAO GetGenericVAO()
+        {
+            _gvao ??= new GenericVAO();
+            _gvao.Clear();
+            return _gvao;
+        }
+
         private static LineVAO GetLineVAO()
         {
             _linevao ??= new LineVAO();
             _linevao.Clear();
             return _linevao;
         }
+
         public static void DrawKnob(
             Vector2d position,
             bool highlight,
@@ -89,10 +107,13 @@ namespace linerider.Rendering
             float growratio)
         {
             Color color = Settings.Computed.BGColor;
-            float size = Settings.LimitLineKnobsSize ? Math.Min(
-                Constants.KnobSize,
-                Constants.KnobSize * (float)Settings.Computed.UIScale * Constants.MaxLimitedKnobSize / Game.Track.Zoom
-            ) : Constants.KnobSize;
+            float size = Settings.LimitLineKnobsSize
+                ? Math.Min(
+                    Constants.KnobSize,
+                    Constants.KnobSize * (float)Settings.Computed.UIScale * Constants.MaxLimitedKnobSize /
+                    Game.Track.Zoom
+                )
+                : Constants.KnobSize;
 
             if (highlight)
             {
@@ -111,50 +132,55 @@ namespace linerider.Rendering
 
             RenderRoundedLine(position, position, color, size);
         }
-        public static void RenderRoundedLine(Vector2d position, Vector2d position2, Color color, float thickness, bool knobs = false, bool redknobs = false)
+
+        public static void RenderRoundedLine(Vector2d position, Vector2d position2, Color color, float thickness,
+            bool knobs = false, bool redknobs = false)
         {
             using (new GLEnableCap(EnableCap.Blend))
             {
-                using (new GLEnableCap(EnableCap.Texture2D))
-                {
-                    GameDrawingMatrix.Enter();
-                    LineVAO vao = GetLineVAO();
-                    vao.Scale = GameDrawingMatrix.Scale;
-                    vao.AddLine(position, position2, color, thickness);
-                    vao.knobstate = knobs ? (redknobs ? (int)KnobState.LifeLock : (int)KnobState.Shown) : (int)KnobState.Hidden;
-                    vao.Draw(PrimitiveType.Triangles);
-                    GameDrawingMatrix.Exit();
-                }
+                //using (new GLEnableCap(EnableCap.Texture2D))
+                //{
+                GameDrawingMatrix.Enter();
+                LineVAO vao = GetLineVAO();
+                vao.Scale = GameDrawingMatrix.Scale;
+                vao.AddLine(position, position2, color, thickness);
+                vao.knobstate =
+                    knobs ? (redknobs ? (int)KnobState.LifeLock : (int)KnobState.Shown) : (int)KnobState.Hidden;
+                vao.Draw(PrimitiveType.Triangles);
+                GameDrawingMatrix.Exit();
+                //}
             }
         }
+
         public static void RenderRoundedRectangle(DoubleRect rect, Color color, float thickness, bool gamecoords = true)
         {
             using (new GLEnableCap(EnableCap.Blend))
             {
-                using (new GLEnableCap(EnableCap.Texture2D))
-                {
-                    if (gamecoords)
-                        GameDrawingMatrix.Enter();
-                    LineVAO vao = GetLineVAO();
-                    vao.Scale = GameDrawingMatrix.Scale;
-                    Vector2d vec1 = rect.Vector;
-                    Vector2d vec2 = vec1 + new Vector2d(rect.Width, 0);
-                    Vector2d vec3 = vec1 + rect.Size;
-                    Vector2d vec4 = vec1 + new Vector2d(0, rect.Height);
-                    vao.AddLine(vec1, vec2, color, thickness);
-                    vao.AddLine(vec2, vec3, color, thickness);
-                    vao.AddLine(vec3, vec4, color, thickness);
-                    vao.AddLine(vec4, vec1, color, thickness);
-                    vao.knobstate = (int)KnobState.Hidden;
-                    vao.Draw(PrimitiveType.Triangles);
-                    if (gamecoords)
-                        GameDrawingMatrix.Exit();
-                }
+                //using (new GLEnableCap(EnableCap.Texture2D))
+                //{
+                if (gamecoords)
+                    GameDrawingMatrix.Enter();
+                LineVAO vao = GetLineVAO();
+                vao.Scale = GameDrawingMatrix.Scale;
+                Vector2d vec1 = rect.Vector;
+                Vector2d vec2 = vec1 + new Vector2d(rect.Width, 0);
+                Vector2d vec3 = vec1 + rect.Size;
+                Vector2d vec4 = vec1 + new Vector2d(0, rect.Height);
+                vao.AddLine(vec1, vec2, color, thickness);
+                vao.AddLine(vec2, vec3, color, thickness);
+                vao.AddLine(vec3, vec4, color, thickness);
+                vao.AddLine(vec4, vec1, color, thickness);
+                vao.knobstate = (int)KnobState.Hidden;
+                vao.Draw(PrimitiveType.Triangles);
+                if (gamecoords)
+                    GameDrawingMatrix.Exit();
+                //}
             }
         }
+
         public static void DbgDrawCamera()
         {
-            GL.PushMatrix();
+            GameDrawingMatrix.UniformBlock.PushMatrix();
             Vector2 center = new(Game.RenderSize.Width / 2, Game.RenderSize.Height / 2);
             DoubleRect rect = Game.Track.Camera.GetClamp(1, Game.RenderSize.Width, Game.RenderSize.Height);
 
@@ -167,32 +193,45 @@ namespace linerider.Rendering
             clamprect.Top -= rect.Height / 2;
             clamprect.Width = rect.Width;
             clamprect.Height = rect.Height;
+            GenericVAO gvao;
             if (!Settings.SmoothCamera && !Settings.RoundLegacyCamera)
             {
-                GL.Begin(PrimitiveType.LineStrip);
-                GL.Color3(0, 0, 0);
-                GL.Vertex2(clamprect.Left, clamprect.Top);
-                GL.Vertex2(clamprect.Right, clamprect.Top);
-                GL.Vertex2(clamprect.Right, clamprect.Bottom);
-                GL.Vertex2(clamprect.Left, clamprect.Bottom);
-                GL.Vertex2(clamprect.Left, clamprect.Top);
-                GL.End();
-                GL.PopMatrix();
+                gvao = GetGenericVAO();
+                //GL.Begin(PrimitiveType.LineStrip);
+                //GL.Color3(0, 0, 0);
+                gvao.AddVertex(new GenericVertex(new Vector2((float)clamprect.Left, (float)clamprect.Top),
+                    Color.Black));
+                gvao.AddVertex(
+                    new GenericVertex(new Vector2((float)clamprect.Right, (float)clamprect.Top), Color.Black));
+                gvao.AddVertex(new GenericVertex(new Vector2((float)clamprect.Right, (float)clamprect.Bottom),
+                    Color.Black));
+                gvao.AddVertex(new GenericVertex(new Vector2((float)clamprect.Left, (float)clamprect.Bottom),
+                    Color.Black));
+                gvao.AddVertex(new GenericVertex(new Vector2((float)clamprect.Left, (float)clamprect.Top),
+                    Color.Black));
+                gvao.Draw(PrimitiveType.LineStrip);
+                GameDrawingMatrix.UniformBlock.PopMatrix();
                 return;
             }
-            GL.Begin(PrimitiveType.LineStrip);
-            GL.Color3(0, 0, 0);
+
+            gvao = GetGenericVAO();
+            //GL.Begin(PrimitiveType.LineStrip);
+            //GL.Color3(0, 0, 0);
             for (int i = 0; i < circle.Length; i++)
             {
                 Vector2d pos = (Vector2d)center + (Vector2d)circle[i];
                 Vector2d square = clamprect.Clamp(pos);
                 Vector2d oval = clamprect.EllipseClamp(pos);
                 pos = Vector2d.Lerp(square, oval, CameraBoundingBox.roundness);
-                GL.Vertex2(pos);
+                gvao.AddVertex(new GenericVertex((Vector2)pos, Color.Black));
             }
-            GL.End();
+
+            gvao.Draw(PrimitiveType.LineStrip);
+
+            gvao = GetGenericVAO();
+            //GL.End();
             // Visualize example points being clamped
-            GL.Begin(PrimitiveType.Lines);
+            //GL.Begin(PrimitiveType.Lines);
             circle = StaticRenderer.GenerateEllipse((float)rect.Width / 1.5f, (float)rect.Height / 1.5f, 20);
             for (int i = 0; i < circle.Length; i++)
             {
@@ -202,48 +241,62 @@ namespace linerider.Rendering
                 pos = Vector2d.Lerp(square, oval, CameraBoundingBox.roundness);
                 if (pos != (Vector2d)center + (Vector2d)circle[i])
                 {
-                    GL.Vertex2(pos);
-                    GL.Vertex2((Vector2d)center + (Vector2d)circle[i]);
+                    gvao.AddVertex(new GenericVertex((Vector2)pos, Color.Black));
+                    gvao.AddVertex(new GenericVertex(center + circle[i], Color.Black));
+                    //GL.Vertex2(pos);
+                    //GL.Vertex2((Vector2d)center + (Vector2d)circle[i]);
                 }
             }
-            GL.End();
-            GL.PopMatrix();
+
+            gvao.Draw(PrimitiveType.Lines);
+            //GL.End();
+            GameDrawingMatrix.UniformBlock.PopMatrix();
             // Visualize rider center
             //DrawCircle(Game.Track.Camera.GetSmoothPosition(), 5, Color.Red);
             //DrawCircle(Game.Track.Camera.GetSmoothedCameraOffset(), 5, Color.Blue);
             DrawCircle(Game.Track.Timeline.GetFrame(Game.Track.Offset).CalculateCenter(), 5, Color.Green);
         }
+
         public static void DrawCircle(Vector2d point, float size, Color color)
         {
             GameDrawingMatrix.Enter();
             Vector2 center = (Vector2)point;
             Vector2d[] circ = StaticRenderer.GenerateCircle(center.X, center.Y, size, 360);
-            GL.Begin(PrimitiveType.LineStrip);
-            GL.Color3(color.R, color.G, color.B);
+            GenericVAO gvao = GetGenericVAO();
+            //GL.Begin(PrimitiveType.LineStrip);
+            //GL.Color3(color.R, color.G, color.B);
             for (int i = 0; i < circ.Length; i++)
             {
-                GL.Vertex2((Vector2)circ[i]);
+                gvao.AddVertex(new GenericVertex((Vector2)circ[i], color));
+                //GL.Vertex2((Vector2)circ[i]);
             }
-            GL.End();
+
+            gvao.Draw(PrimitiveType.LineStrip);
+            //GL.End();
             GameDrawingMatrix.Exit();
         }
+
         public static void DrawBezierCurve(Vector2[] points, Color color, int resolution)
         {
-
             Vector2[] curvePoints = GenerateBezierCurve(points, resolution);
             if (points.Length > 0)
             {
                 GameDrawingMatrix.Enter();
-                GL.Begin(PrimitiveType.LineStrip);
-                GL.Color3(color.R, color.G, color.B);
+                GenericVAO gvao = GetGenericVAO();
+                //GL.Begin(PrimitiveType.LineStrip);
+                //GL.Color3(color.R, color.G, color.B);
                 for (int i = 0; i < curvePoints.Length; i++)
                 {
-                    GL.Vertex2(curvePoints[i]);
+                    gvao.AddVertex(new GenericVertex(curvePoints[i], color));
+                    //GL.Vertex2(curvePoints[i]);
                 }
-                GL.End();
+
+                gvao.Draw(PrimitiveType.LineStrip);
+                //GL.End();
                 GameDrawingMatrix.Exit();
             }
         }
+
         public static void RenderPoints(List<Vector2d> points, Color color, float nodeSize, float thickness)
         {
             for (int i = 0; i < points.Count; i++)
@@ -258,22 +311,30 @@ namespace linerider.Rendering
                     DrawCircle(points[i], nodeSize, color);
                 }
             }
+
             RenderPointOutline(points, color);
         }
+
         private static void RenderPointOutline(List<Vector2d> points, Color color)
         {
             GameDrawingMatrix.Enter();
-            GL.Begin(PrimitiveType.LineStrip);
+            //GL.Begin(PrimitiveType.LineStrip);
+            GenericVAO gvao = GetGenericVAO();
             for (int i = 0; i < points.Count; i++)
             {
                 Color col = (i < 1 || i == points.Count - 1) ? color : Color.FromArgb(255, 200, 0);
-                GL.Color3(col.R, col.G, col.B);
-                GL.Vertex2(points[i]);
+                //GL.Color3(col.R, col.G, col.B);
+                //GL.Vertex2(points[i]);
+                gvao.AddVertex(new GenericVertex((Vector2)points[i], col));
             }
-            GL.End();
+
+            gvao.Draw(PrimitiveType.LineStrip);
+            //GL.End();
             GameDrawingMatrix.Exit();
         }
-        public static void RenderPoints(List<Vector2d> points, BezierCurve curve, Color color, float nodeSize, float thickness)
+
+        public static void RenderPoints(List<Vector2d> points, BezierCurve curve, Color color, float nodeSize,
+            float thickness)
         {
             for (int i = 0; i < points.Count; i++)
             {
@@ -287,8 +348,10 @@ namespace linerider.Rendering
                     DrawCircle(points[i], nodeSize, color);
                 }
             }
+
             renderPointTrace(points, curve, color);
         }
+
         private static void renderPointTrace(List<Vector2d> points, BezierCurve curve, Color color)
         {
             double lineLength = 0;
@@ -298,20 +361,27 @@ namespace linerider.Rendering
                 lineLength += Distance(points[i - 1], points[i]);
                 lengthsPerPoint.Add(lineLength);
             }
+
             for (int i = 1; i < points.Count - 1; i++)
             {
                 Vector2 curvePoint = curve.CalculatePoint((float)lengthsPerPoint[i] / (float)lineLength);
                 GameDrawingMatrix.Enter();
-                GL.Begin(PrimitiveType.LineStrip);
-                GL.Color3(color.R, color.B, color.G);
-                GL.Vertex2(points[i]);
-                GL.Vertex2(curvePoint);
-                GL.End();
+                GenericVAO gvao = GetGenericVAO();
+                //GL.Begin(PrimitiveType.LineStrip);
+                //GL.Color3(color.R, color.B, color.G);
+                //GL.Vertex2(points[i]);
+                gvao.AddVertex(new GenericVertex((Vector2)points[i], color));
+                //GL.Vertex2(curvePoint);
+                gvao.AddVertex(new GenericVertex(curvePoint, color));
+                //GL.End();
+                gvao.Draw(PrimitiveType.LineStrip);
                 GameDrawingMatrix.Exit();
             }
         }
+
         public static double Distance(Vector2d a, Vector2d b)
             => Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
+
         public static Vector2[] GenerateBezierCurve(Vector2[] points, int resPerHundred)
         {
             BezierCurve curve = new(points);
@@ -373,33 +443,89 @@ namespace linerider.Rendering
             return [.. curvePoints];
         }
 
-        public static void DrawFloatGrid() // Draws the grid of floating-point 'regions', used in the creation of stable angled kramuals
+        private static int _gridvao = -1;
+
+        static int GridVAO
         {
+            get {
+                if (_gridvao == -1)
+                {
+                    _gridvao = GL.GenVertexArray();
+                    GL.BindVertexArray(_gridvao);
+                    var vbo = GridVBO;
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+                    GL.EnableVertexAttribArray(0);
+                    GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2*sizeof(float), 0);
+                    GL.BindVertexArray(0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+                }
+                return _gridvao;
+            }
+        }
+
+        // used for both float and sim grid
+        
+        private static int _gridvbo = -1;
+
+        static int GridVBO
+        {
+            get
+            {
+                if (_gridvbo == -1)
+                {
+                    _gridvbo = GL.GenBuffer();
+                }
+
+                return _gridvbo;
+            }
+        }
+
+        public static unsafe void DrawFloatGrid() // Draws the grid of floating-point 'regions', used in the creation of stable angled kramuals
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, GridVBO);
+            GL.BindVertexArray(GridVAO);
             Shader _shader = Shaders.FloatGridShader;
             _shader.Use();
 
             int u_zoom = _shader.GetUniform("u_zoom"); // Set uniform var used in fragment shader
 
             GL.Uniform1(u_zoom, Game.Track.Zoom);
+            
+            GameDrawingMatrix.UniformBlock.PushMatrix();
+            GameDrawingMatrix.UniformBlock.Translate(new Vector3d(-Game.ScreenTranslation * Game.Track.Zoom)); // This transforms from pixel coordinates back to world coordinates (used in vert shader)
+            //GameDrawingMatrix.UniformBlock.Scale(Game.Track.Zoom, Game.Track.Zoom, 0);
+            GameDrawingMatrix.UniformBlock.Scale((float)1.0 / Game.Track.Zoom, (float)1.0 / Game.Track.Zoom, 0);
 
-            GL.PushMatrix();
-            GL.Translate(new Vector3d(-Game.ScreenTranslation)); // This transforms from pixel coordinates back to world coordinates (used in vert shader)
-            GL.Scale(1.0 / Game.Track.Zoom, 1.0 / Game.Track.Zoom, 0);
+            float[] verts = new float[8]
+            {
+                0, 0,
+                Game.RenderSize.Width, 0,
+                0, Game.RenderSize.Height,
+                Game.RenderSize.Width, Game.RenderSize.Height,
+            };
+            
+            fixed (float* ptr = verts)
+                GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * 8, (IntPtr)ptr, BufferUsageHint.StreamDraw);
+            
+            //GL.Begin(PrimitiveType.Quads);
 
-            GL.Begin(PrimitiveType.Quads);
+            //GL.Vertex2(new Vector2d(0, 0));
+            //GL.Vertex2(new Vector2d(Game.RenderSize.Width, 0));
+            //GL.Vertex2(new Vector2d(Game.RenderSize.Width, Game.RenderSize.Height));
+            //GL.Vertex2(new Vector2d(0, Game.RenderSize.Height));
 
-            GL.Vertex2(new Vector2d(0, 0));
-            GL.Vertex2(new Vector2d(Game.RenderSize.Width, 0));
-            GL.Vertex2(new Vector2d(Game.RenderSize.Width, Game.RenderSize.Height));
-            GL.Vertex2(new Vector2d(0, Game.RenderSize.Height));
-
-            GL.End();
+            //GL.End();
+            GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
             _shader.Stop();
-            GL.PopMatrix();
+            GL.BindVertexArray(0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GameDrawingMatrix.UniformBlock.PopMatrix();
         }
 
-        public static void DrawGrid_Shader(int sqsize) // Draw the grid using per-pixel shading (more efficient for low zoom where more grid-lines are needed)
+        public static unsafe void DrawGrid_Shader(int sqsize) // Draw the grid using per-pixel shading (more efficient for low zoom where more grid-lines are needed)
         {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, GridVBO);
+            GL.BindVertexArray(GridVAO);
             Shader _shader = Shaders.SimGridShader;
             _shader.Use();
 
@@ -409,20 +535,34 @@ namespace linerider.Rendering
             GL.Uniform1(u_zoom, Game.Track.Zoom);
             GL.Uniform1(u_cellsize, (float)sqsize); // TODO: make this sync with DbgDrawGrid() cellsize
 
-            GL.PushMatrix();
-            GL.Translate(new Vector3d(-Game.ScreenTranslation)); // This transforms from pixel coordinates back to world coordinates (used in vert shader)
-            GL.Scale(1.0 / Game.Track.Zoom, 1.0 / Game.Track.Zoom, 0);
+            GameDrawingMatrix.UniformBlock.PushMatrix();
+            GameDrawingMatrix.UniformBlock.Translate(new Vector3d(-Game.ScreenTranslation * Game.Track.Zoom)); // This transforms from pixel coordinates back to world coordinates (used in vert shader)
+            GameDrawingMatrix.UniformBlock.Scale((float)1.0 / Game.Track.Zoom, (float)1.0 / Game.Track.Zoom, 0);
 
-            GL.Begin(PrimitiveType.Quads);
+            float[] verts = new float[8]
+            {
+                0, 0,
+                Game.RenderSize.Width, 0,
+                0, Game.RenderSize.Height,
+                Game.RenderSize.Width, Game.RenderSize.Height,
+            };
+            
+            fixed (float* ptr = verts)
+                GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * 8, (IntPtr)ptr, BufferUsageHint.StreamDraw);
+            
+            /*GL.Begin(PrimitiveType.Quads);
 
             GL.Vertex2(new Vector2d(0, 0));
             GL.Vertex2(new Vector2d(Game.RenderSize.Width, 0));
             GL.Vertex2(new Vector2d(Game.RenderSize.Width, Game.RenderSize.Height));
             GL.Vertex2(new Vector2d(0, Game.RenderSize.Height));
 
-            GL.End();
+            GL.End();*/
+            GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
             _shader.Stop();
-            GL.PopMatrix();
+            GL.BindVertexArray(0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GameDrawingMatrix.UniformBlock.PopMatrix();
         }
 
         public static void DbgDrawGrid()
@@ -432,10 +572,11 @@ namespace linerider.Rendering
             bool useshadergrid = true;
             int sqsize = fastgrid ? EditorGrid.CellSize : SimulationGrid.CellSize;
 
-            GL.PushMatrix();
-            GL.Scale(Game.Track.Zoom, Game.Track.Zoom, 0);
-            GL.Translate(new Vector3d(Game.ScreenTranslation));
-            GL.Begin(PrimitiveType.Quads);
+            GameDrawingMatrix.UniformBlock.PushMatrix();
+            GameDrawingMatrix.UniformBlock.Scale(Game.Track.Zoom, Game.Track.Zoom, 0);
+            GameDrawingMatrix.UniformBlock.Translate(new Vector3d(Game.ScreenTranslation));
+            //GL.Begin(PrimitiveType.Quads);
+            GenericVAO gvao = GetGenericVAO();
             for (int x = -sqsize; x < (Game.RenderSize.Width / Game.Track.Zoom); x += sqsize)
             {
                 for (int y = -sqsize; y < (Game.RenderSize.Height / Game.Track.Zoom); y += sqsize)
@@ -446,72 +587,132 @@ namespace linerider.Rendering
                     {
                         GridPoint gridpos = new((int)Math.Floor(yv.X / sqsize), (int)Math.Floor(yv.Y / sqsize));
 
-                        if (Game.Track.GridCheck(yv.X, yv.Y))
-                        {
-                            if (Game.Track.RenderRider.PhysicsBounds.ContainsPoint(gridpos))
-                                GL.Color3(Color.LightSlateGray.R, Color.LightSlateGray.G, Color.LightSlateGray.B);
-                            else
-                                GL.Color3(Color.Yellow.R, Color.Yellow.G, Color.Yellow.B);
-                            GL.Vertex2(yv);
-                            yv.Y += sqsize;
-                            GL.Vertex2(yv);
-                            yv.X += sqsize;
-                            GL.Vertex2(yv);
-                            yv.Y -= sqsize;
-                            GL.Vertex2(yv);
-                        }
                         if (renderridersquare)
                         {
                             if (Game.Track.RenderRider.PhysicsBounds.ContainsPoint(gridpos))
                             {
-                                GL.Color3(Color.LightGray.R, Color.LightGray.G, Color.LightGray.B);
-                                GL.Vertex2(yv);
+                                Color col = Color.LightGray;
+                                //GL.Color3(Color.LightGray.R, Color.LightGray.G, Color.LightGray.B);
+                                
+                                Vector2d[] verts = new Vector2d[6]
+                                {
+                                    yv,
+                                    yv + Vector2d.UnitY * sqsize,
+                                    yv + Vector2d.UnitY * sqsize + Vector2d.UnitX * sqsize,
+                                
+                                    yv + Vector2d.UnitY * sqsize + Vector2d.UnitX * sqsize,
+                                    yv + Vector2d.UnitX * sqsize,
+                                    yv,
+                                };
+
+                                foreach (Vector2d v in verts)
+                                {
+                                    gvao.AddVertex(new GenericVertex((Vector2)v, col));
+                                }
+                                
+                                /*GL.Vertex2(yv);
                                 yv.Y += sqsize;
                                 GL.Vertex2(yv);
                                 yv.X += sqsize;
                                 GL.Vertex2(yv);
                                 yv.Y -= sqsize;
-                                GL.Vertex2(yv);
+                                GL.Vertex2(yv);*/
                             }
                         }
+                        
+                        if (Game.Track.GridCheck(yv.X, yv.Y))
+                        {
+                            Color col;
+                            if (Game.Track.RenderRider.PhysicsBounds.ContainsPoint(gridpos))
+                                col=Color.LightSlateGray;//GL.Color3(Color.LightSlateGray.R, Color.LightSlateGray.G, Color.LightSlateGray.B);
+                            else
+                                col=Color.Yellow;//GL.Color3(Color.Yellow.R, Color.Yellow.G, Color.Yellow.B);
+                            Vector2d[] verts = new Vector2d[6]
+                            {
+                                yv,
+                                yv + Vector2d.UnitY * sqsize,
+                                yv + Vector2d.UnitY * sqsize + Vector2d.UnitX * sqsize,
+                                
+                                yv + Vector2d.UnitY * sqsize + Vector2d.UnitX * sqsize,
+                                yv + Vector2d.UnitX * sqsize,
+                                yv,
+                            };
+
+                            foreach (Vector2d v in verts)
+                            {
+                                gvao.AddVertex(new GenericVertex((Vector2)v, col));
+                            }
+                            //GL.Vertex2(yv);
+                            //yv.Y += sqsize;
+                            //GL.Vertex2(yv);
+                            //yv.X += sqsize;
+                            //GL.Vertex2(yv);
+                            //yv.Y -= sqsize;
+                            //GL.Vertex2(yv);
+                        }
+                        
                     }
                     else if (Game.Track.FastGridCheck(yv.X, yv.Y))
                     {
-                        GL.Color3(Color.Yellow.R, Color.Yellow.G, Color.Yellow.B);
+                        /*GL.Color3(Color.Yellow.R, Color.Yellow.G, Color.Yellow.B);
                         GL.Vertex2(yv);
                         yv.Y += sqsize;
                         GL.Vertex2(yv);
                         yv.X += sqsize;
                         GL.Vertex2(yv);
                         yv.Y -= sqsize;
-                        GL.Vertex2(yv);
+                        GL.Vertex2(yv);*/
+                        Color col = Color.Yellow;
+                        Vector2d[] verts = new Vector2d[6]
+                        {
+                            yv,
+                            yv + Vector2d.UnitY * sqsize,
+                            yv + Vector2d.UnitY * sqsize + Vector2d.UnitX * sqsize,
+                                
+                            yv + Vector2d.UnitY * sqsize + Vector2d.UnitX * sqsize,
+                            yv + Vector2d.UnitX * sqsize,
+                            yv,
+                        };
+
+                        foreach (Vector2d v in verts)
+                        {
+                            gvao.AddVertex(new GenericVertex((Vector2)v, col));
+                        }
                     }
                 }
             }
 
-            GL.End();
+            //GL.End();
+            gvao.Draw(PrimitiveType.Triangles);
 
             if (!useshadergrid)
             {
-                GL.Begin(PrimitiveType.Lines);
-                GL.Color3(Color.Red.R, Color.Red.G, Color.Red.B);
+                gvao = GetGenericVAO();
+                //GL.Begin(PrimitiveType.Lines);
+                Color col = Color.Red;
+                //GL.Color3(Color.Red.R, Color.Red.G, Color.Red.B);
                 for (int x = -sqsize; x < (Game.RenderSize.Width / Game.Track.Zoom); x += sqsize)
                 {
                     Vector2d yv = new(x + (Game.ScreenPosition.X - Game.ScreenPosition.X % sqsize), Game.ScreenPosition.Y);
-                    GL.Vertex2(yv);
+                    gvao.AddVertex(new GenericVertex((Vector2)yv, col));
+                    //GL.Vertex2(yv);
                     yv.Y += Game.RenderSize.Height / Game.Track.Zoom;
-                    GL.Vertex2(yv);
+                    gvao.AddVertex(new GenericVertex((Vector2)yv, col));
+                    //GL.Vertex2(yv);
                 }
                 for (int y = -sqsize; y < (Game.RenderSize.Height / Game.Track.Zoom); y += sqsize)
                 {
                     Vector2d yv = new(Game.ScreenPosition.X, y + (Game.ScreenPosition.Y - Game.ScreenPosition.Y % sqsize));
-                    GL.Vertex2(yv);
+                    gvao.AddVertex(new GenericVertex((Vector2)yv, col));
+                    //GL.Vertex2(yv);
                     yv.X += Game.RenderSize.Width / Game.Track.Zoom;
-                    GL.Vertex2(yv);
+                    gvao.AddVertex(new GenericVertex((Vector2)yv, col));
+                    //GL.Vertex2(yv);
                 }
-                GL.End();
+                //GL.End();
+                gvao.Draw(PrimitiveType.Lines);
             }
-            GL.PopMatrix();
+            GameDrawingMatrix.UniformBlock.PopMatrix();
             if (useshadergrid)
             {
                 DrawGrid_Shader(sqsize);

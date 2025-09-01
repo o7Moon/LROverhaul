@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 uniform sampler2D u_bodytex;
 uniform sampler2D u_bodydeadtex;
 uniform sampler2D u_armtex;
@@ -6,9 +6,11 @@ uniform sampler2D u_legtex;
 uniform sampler2D u_sledtex;
 uniform sampler2D u_sledbrokentex;
 
-varying float v_unit;
-varying vec4 v_color;
-varying vec2 v_texcoord; 
+in float v_unit;
+in vec4 v_color;
+in vec2 v_texcoord; 
+
+out vec4 FragColor;
 
 void main()
 {
@@ -29,5 +31,5 @@ void main()
         color = texture2D(u_sledbrokentex, v_texcoord);
     else
         color = vec4(1.0, 0.0, 0.0, 1.0); // Invalid, show red
-    gl_FragColor = color * v_color;
+    FragColor = color * v_color;
 }

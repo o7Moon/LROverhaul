@@ -16,12 +16,36 @@ namespace linerider.Rendering
         public float Scale = 1.0f;
         private readonly Shader _shader;
         private readonly GLBuffer<RiderVertex> _vbo;
+        private readonly int _vao;
         private readonly LineVAO _lines = new();
         private readonly LineVAO _momentumvao = new();
         public RiderRenderer()
         {
             _shader = Shaders.RiderShader;
+            _vao = GL.GenVertexArray();
+            GL.BindVertexArray(_vao);
             _vbo = new GLBuffer<RiderVertex>(BufferTarget.ArrayBuffer);
+            _vbo.Bind();
+            int in_vertex = _shader.GetAttrib("in_vertex");
+            int in_texcoord = _shader.GetAttrib("in_texcoord");
+            int in_unit = _shader.GetAttrib("in_unit");
+            int in_color = _shader.GetAttrib("in_color");
+            int offset = 0;
+            GL.VertexAttribPointer(in_vertex, 2, VertexAttribPointerType.Float, false, RiderVertex.Size, offset);
+            GL.EnableVertexAttribArray(in_vertex);
+            offset += 8;
+            GL.VertexAttribPointer(in_texcoord, 2, VertexAttribPointerType.Float, false, RiderVertex.Size, offset);
+            GL.EnableVertexAttribArray(in_texcoord);
+            offset += 8;
+            GL.VertexAttribPointer(in_unit, 1, VertexAttribPointerType.Float, false, RiderVertex.Size, offset);
+            GL.EnableVertexAttribArray(in_unit);
+            offset += 4;
+            GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, RiderVertex.Size, offset);
+            GL.EnableVertexAttribArray(in_color);
+            
+            GL.BindVertexArray(0);
+            
+            _vbo.Unbind();
         }
         public void DrawMomentum(Rider rider, float opacity)
         {
@@ -264,25 +288,12 @@ namespace linerider.Rendering
         protected unsafe void BeginDraw()
         {
             _vbo.Bind();
+            GL.BindVertexArray(_vao);
             _shader.Use();
             EnsureBufferSize(Array.Count);
-            int in_vertex = _shader.GetAttrib("in_vertex");
-            int in_texcoord = _shader.GetAttrib("in_texcoord");
-            int in_unit = _shader.GetAttrib("in_unit");
-            int in_color = _shader.GetAttrib("in_color");
-            GL.EnableVertexAttribArray(in_vertex);
-            GL.EnableVertexAttribArray(in_texcoord);
-            GL.EnableVertexAttribArray(in_unit);
-            GL.EnableVertexAttribArray(in_color);
+            
             _vbo.SetData(Array.unsafe_array, 0, 0, Array.Count);
-            int offset = 0;
-            GL.VertexAttribPointer(in_vertex, 2, VertexAttribPointerType.Float, false, RiderVertex.Size, offset);
-            offset += 8;
-            GL.VertexAttribPointer(in_texcoord, 2, VertexAttribPointerType.Float, false, RiderVertex.Size, offset);
-            offset += 8;
-            GL.VertexAttribPointer(in_unit, 1, VertexAttribPointerType.Float, false, RiderVertex.Size, offset);
-            offset += 4;
-            GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, RiderVertex.Size, offset);
+            
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, Models.BodyTexture);
             GL.ActiveTexture(TextureUnit.Texture1);
@@ -328,14 +339,14 @@ namespace linerider.Rendering
         }
         protected void EndDraw()
         {
-            int in_vertex = _shader.GetAttrib("in_vertex");
+            /*int in_vertex = _shader.GetAttrib("in_vertex");
             int in_texcoord = _shader.GetAttrib("in_texcoord");
             int in_unit = _shader.GetAttrib("in_unit");
             int in_color = _shader.GetAttrib("in_color");
             GL.DisableVertexAttribArray(in_vertex);
             GL.DisableVertexAttribArray(in_texcoord);
             GL.DisableVertexAttribArray(in_unit);
-            GL.DisableVertexAttribArray(in_color);
+            GL.DisableVertexAttribArray(in_color);*/
 
             GL.ActiveTexture(TextureUnit.Texture5);
             GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -350,6 +361,7 @@ namespace linerider.Rendering
             // End on unit 0
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.BindVertexArray(0);
             _vbo.Unbind();
             _shader.Stop();
         }

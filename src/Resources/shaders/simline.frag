@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 uniform float u_scale;
 uniform int u_knobstate;
 uniform bool u_alphachannel;
@@ -6,10 +6,11 @@ uniform bool u_overlay;
 uniform vec4 u_knobcolor;
 uniform float u_knobsize;
 // Basically u/v coordinates to the circle.
-varying vec2 v_circle;
-varying vec2 v_linesize;
-varying vec4 v_color;
-varying float v_selectflags;
+in vec2 v_circle;
+in vec2 v_linesize;
+in vec4 v_color;
+in float v_selectflags;
+out vec4 FragColor;
 
 float v_scale;
 // The ratio height/width of the line
@@ -53,5 +54,5 @@ void main()
         color.a *= v_color.a;
     if (!u_overlay && v_selectflags == 1.0)
         color.rgb = mix(color.rgb,vec3(0.5, 0.5, 0.5), 0.25);
-    gl_FragColor = color;
+    FragColor = color;
 }

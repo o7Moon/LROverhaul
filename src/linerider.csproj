@@ -111,6 +111,8 @@
     <EmbeddedResource Include="Resources\shaders\floatgrid.vert" />
     <EmbeddedResource Include="Resources\shaders\simgrid.frag" />
     <EmbeddedResource Include="Resources\shaders\simgrid.vert" />
+    <EmbeddedResource Include="Resources\shaders\generic.frag" />
+    <EmbeddedResource Include="Resources\shaders\generic.vert" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />

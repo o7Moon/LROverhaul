@@ -19,6 +19,7 @@ namespace linerider.Rendering
         private readonly Shader _shader;
         private readonly GLBuffer<LineVertex> _vbo;
         private readonly GLBuffer<int> _ibo;
+        private readonly int _vao;
         private readonly AutoArray<int> _indices = new(StartingLineCount * linesize);
         private readonly Queue<int> freevertices = new();
         private int _vertexcount = 0;
@@ -29,12 +30,37 @@ namespace linerider.Rendering
             _shader = sh ?? throw new ArgumentNullException("shader");
             _vbo = new GLBuffer<LineVertex>(BufferTarget.ArrayBuffer);
             _ibo = new GLBuffer<int>(BufferTarget.ElementArrayBuffer);
+            _vao = GL.GenVertexArray();
+            GL.BindVertexArray(_vao);
             _vbo.Bind();
             _vbo.SetSize(StartingLineCount * linesize, BufferUsageHint.DynamicDraw);
-            _vbo.Unbind();
-
+            
             _ibo.Bind();
             _ibo.SetSize(StartingLineCount * linesize, BufferUsageHint.DynamicDraw);
+            
+            int in_vertex = _shader.GetAttrib("in_vertex");
+            int in_color = _shader.GetAttrib("in_color");
+            int in_circle = _shader.GetAttrib("in_circle");
+            int in_selectflags = _shader.GetAttrib("in_selectflags");
+            int in_linesize = _shader.GetAttrib("in_linesize");
+            GL.EnableVertexAttribArray(in_vertex);
+            GL.EnableVertexAttribArray(in_color);
+            GL.EnableVertexAttribArray(in_circle);
+            GL.EnableVertexAttribArray(in_selectflags);
+            GL.EnableVertexAttribArray(in_linesize);
+            int counter = 0;
+            GL.VertexAttribPointer(in_vertex, 2, VertexAttribPointerType.Float, false, LineVertex.Size, counter);
+            counter += 8;
+            GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, LineVertex.Size, counter);
+            counter += 4;
+            GL.VertexAttribPointer(in_circle, 2, VertexAttribPointerType.Byte, false, LineVertex.Size, counter);
+            counter += 2;
+            GL.VertexAttribPointer(in_selectflags, 1, VertexAttribPointerType.Byte, false, LineVertex.Size, counter);
+            counter += 2;
+            GL.VertexAttribPointer(in_linesize, 2, VertexAttribPointerType.Float, false, LineVertex.Size, counter);
+            
+            GL.BindVertexArray(0);
+            _vbo.Unbind();
             _ibo.Unbind();
         }
         public void Clear()
@@ -162,28 +188,8 @@ namespace linerider.Rendering
         }
         protected void BeginDraw()
         {
-            _vbo.Bind();
+            GL.BindVertexArray(_vao);
             _shader.Use();
-            int in_vertex = _shader.GetAttrib("in_vertex");
-            int in_color = _shader.GetAttrib("in_color");
-            int in_circle = _shader.GetAttrib("in_circle");
-            int in_selectflags = _shader.GetAttrib("in_selectflags");
-            int in_linesize = _shader.GetAttrib("in_linesize");
-            GL.EnableVertexAttribArray(in_vertex);
-            GL.EnableVertexAttribArray(in_color);
-            GL.EnableVertexAttribArray(in_circle);
-            GL.EnableVertexAttribArray(in_selectflags);
-            GL.EnableVertexAttribArray(in_linesize);
-            int counter = 0;
-            GL.VertexAttribPointer(in_vertex, 2, VertexAttribPointerType.Float, false, LineVertex.Size, counter);
-            counter += 8;
-            GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, LineVertex.Size, counter);
-            counter += 4;
-            GL.VertexAttribPointer(in_circle, 2, VertexAttribPointerType.Byte, false, LineVertex.Size, counter);
-            counter += 2;
-            GL.VertexAttribPointer(in_selectflags, 1, VertexAttribPointerType.Byte, false, LineVertex.Size, counter);
-            counter += 2;
-            GL.VertexAttribPointer(in_linesize, 2, VertexAttribPointerType.Float, false, LineVertex.Size, counter);
             Color global = OverrideColor;
             double relativeKnobSize = Settings.LimitLineKnobsSize ? Math.Min(
                 Constants.KnobSize,
@@ -204,23 +210,24 @@ namespace linerider.Rendering
             if (_indices.Count == 0)
                 return;
             BeginDraw();
-            _ibo.Bind();
+            //_ibo.Bind();
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.DrawElements(PrimitiveType.Triangles, _indices.Count, DrawElementsType.UnsignedInt, 0);
             }
-            _ibo.Unbind();
+            //_ibo.Unbind();
             EndDraw();
         }
         protected void EndDraw()
         {
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_vertex"));
+            /*GL.DisableVertexAttribArray(_shader.GetAttrib("in_vertex"));
             GL.DisableVertexAttribArray(_shader.GetAttrib("in_color"));
             GL.DisableVertexAttribArray(_shader.GetAttrib("in_circle"));
             GL.DisableVertexAttribArray(_shader.GetAttrib("in_selectflags"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_linesize"));
+            GL.DisableVertexAttribArray(_shader.GetAttrib("in_linesize"));*/
             _shader.Stop();
-            _vbo.Unbind();
+            //_vbo.Unbind();
+            GL.BindVertexArray(0);
         }
         private void EnsureVBOSize(int size)
         {

@@ -1,9 +1,11 @@
-#version 120 /*TODO MAKE LINE COLOURS UNIFORMS*/
+#version 330 core 
+/*TODO MAKE LINE COLOURS UNIFORMS*/
 
 uniform float u_zoom; // The current track zoom (needed to calculate the separation of neighbouring pixels)
 
-varying vec2 world_position;
-varying vec2 pixel_coord;
+in vec2 world_position;
+in vec2 pixel_coord;
+out vec4 FragColor;
 
 float sign(float val){
 	return val/abs(val);
@@ -26,5 +28,5 @@ void main()
 
 	float alpha = 1.0 - grid_alph(world_position, 1.0);
 	color = vec4(0.0, 0.0, 1.0, alpha);
-    gl_FragColor = color;
+    FragColor = color;
 }

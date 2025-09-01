@@ -2,6 +2,17 @@ namespace linerider.Drawing
 {
     public static class Shaders
     {
+        private static Shader _genericshader = null;
+
+        public static Shader GenericShader
+        {
+            get
+            {
+                if (!_initialized)
+                    Load();
+                return _genericshader;
+            }
+        }
         private static Shader _lineshader = null;
         public static Shader LineShader
         {
@@ -63,6 +74,9 @@ namespace linerider.Drawing
                 _floatgridshader = new Shader(
                     GameResources.floatgrid_vert,
                     GameResources.floatgrid_frag);
+                _genericshader = new Shader(
+                    GameResources.generic_vert,
+                    GameResources.generic_frag);
             }
         }
     }

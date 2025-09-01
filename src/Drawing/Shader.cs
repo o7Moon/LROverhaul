@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using linerider.Rendering;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ namespace linerider.Drawing
         private readonly int _program;
         private readonly Dictionary<string, int> _attributes = [];
         private readonly Dictionary<string, int> _uniforms = [];
-        public Shader(string vert, string frag)
+        public Shader(string vert, string frag, bool bind_matrices = true)
         {
             _program = GL.CreateProgram();
             _frag = GL.CreateShader(ShaderType.FragmentShader);
@@ -30,6 +31,10 @@ namespace linerider.Drawing
                 throw new Exception("Shader program link error: " + GL.GetProgramInfoLog(_program));
             }
             GL.ValidateProgram(_program);
+            if (bind_matrices)
+            {
+                GameDrawingMatrix.UniformBlock.BindShader(_program);
+            }
         }
         public int GetAttrib(string attributename)
         {

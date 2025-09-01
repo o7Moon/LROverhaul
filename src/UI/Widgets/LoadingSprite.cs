@@ -22,6 +22,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
+using linerider.Rendering;
+using linerider.Utils;
 
 namespace linerider.UI.Widgets
 {
@@ -41,21 +43,26 @@ namespace linerider.UI.Widgets
         }
         protected override void Render(Gwen.Skin.SkinBase skin)
         {
-            // TODO
-            return;
             ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
             float rotation = Environment.TickCount % 1000 / 1000f;
-            Vector3d trans = new(X + Width / 2, Y + Height / 2, 0);
-            GL.Translate(Width / -4, Height / -4, 0);
-            GL.PushMatrix();
-            GL.Translate(trans);
-            GL.Rotate(360 * rotation, Vector3d.UnitZ);
-            GL.Scale(0.5, 0.5, 0);
-            GL.Translate(-trans);
-            skin.Renderer.DrawColor = Color.FromArgb(Alpha, Color);
-            skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
-            ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
-            GL.PopMatrix();
+            Vector3d trans = new(X + Width / 2.0f, Y + Height / 2.0f, 0);
+            GameDrawingMatrix.UniformBlock.PushMatrix();
+            GameDrawingMatrix.UniformBlock.LoadIdentity();
+            GameDrawingMatrix.UniformBlock.Translate(new Vector3(Bounds.Left, Bounds.Top + 16, 0));
+            GameDrawingMatrix.UniformBlock.Rotate(360 * rotation, 0, 0, 1);
+            
+            //GameDrawingMatrix.UniformBlock.Translate(trans);
+            //GameDrawingMatrix.UniformBlock.Scale(0.5f, 0.5f, 0);
+            //GameDrawingMatrix.UniformBlock.Translate(-trans);
+            StaticRenderer.DrawTexture((int)m_texture.RendererData, new DoubleRect(-16, -16, 32, 32),
+                r: Color.R,
+                g: Color.G,
+                b: Color.B
+            );
+            //skin.Renderer.DrawColor = Color.FromArgb(Alpha, Color);
+            //skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
+            //((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
+            GameDrawingMatrix.UniformBlock.PopMatrix();
         }
     }
 }

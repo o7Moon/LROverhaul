@@ -29,8 +29,8 @@ namespace linerider.Rendering
             {
                 Vector2d offs = camera.GetFrameCamera(options.OverlayFrame);
                 Vector2d diff = offs - camera.GetFrameCamera(game.Track.Offset);
-                GL.PushMatrix();
-                GL.Translate(new Vector3d(-diff * game.Track.Zoom));
+                GameDrawingMatrix.UniformBlock.PushMatrix();
+                GameDrawingMatrix.UniformBlock.Translate(new Vector3d(-diff * game.Track.Zoom));
                 DrawOptions overlayopts = new()
                 {
                     Zoom = options.Zoom,
@@ -38,7 +38,7 @@ namespace linerider.Rendering
                     Overlay = true
                 };
                 _trackrenderer.Render(overlayopts, TrackRecorder.Recording);
-                GL.PopMatrix();
+                GameDrawingMatrix.UniformBlock.PopMatrix();
             }
             _trackrenderer.Render(options, TrackRecorder.Recording);
             if (Settings.OnionSkinning)
@@ -64,6 +64,7 @@ namespace linerider.Rendering
                     }
                 }
             }
+            
             if (options.DrawFlag)
                 _riderrenderer.DrawRider(
                     0.3f,

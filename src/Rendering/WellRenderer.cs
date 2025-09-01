@@ -10,16 +10,31 @@ namespace linerider.Rendering
     public class WellRenderer : IDisposable
     {
         private readonly GLBuffer<GenericVertex> _vbo;
+        private readonly int _vao;
         private readonly Dictionary<int, int> _lines = [];
         private int _vertexcounter = 0;
         private const int wellsize = 6;
         public WellRenderer()
         {
             _vbo = new GLBuffer<GenericVertex>(BufferTarget.ArrayBuffer);
+            _vao = GL.GenVertexArray();
+            GL.BindVertexArray(_vao);
             _vbo.Bind();
             _vbo.SetSize(
                 LineRenderer.StartingLineCount * wellsize,
                 BufferUsageHint.DynamicDraw);
+            
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, GenericVertex.Size, 0);
+            
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, GenericVertex.Size, 8);
+            
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, GenericVertex.Size, 12);
+
+            GL.BindVertexArray(0);
+            
             _vbo.Unbind();
         }
         public void Clear()
@@ -32,15 +47,17 @@ namespace linerider.Rendering
         {
             using (new GLEnableCap(EnableCap.Blend))
             {
-                _vbo.Bind();
-                GL.EnableClientState(ArrayCap.VertexArray);
-                GL.EnableClientState(ArrayCap.ColorArray);
-                GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, 0);
-                GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
+                GL.BindVertexArray(_vao);
+                Shaders.GenericShader.Use();
+                //GL.EnableClientState(ArrayCap.VertexArray);
+                //GL.EnableClientState(ArrayCap.ColorArray);
+                //GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, 0);
+                //GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexcounter);
-                GL.DisableClientState(ArrayCap.ColorArray);
-                GL.DisableClientState(ArrayCap.VertexArray);
-                _vbo.Unbind();
+                //GL.DisableClientState(ArrayCap.ColorArray);
+                //GL.DisableClientState(ArrayCap.VertexArray);
+                Shaders.GenericShader.Stop();
+                GL.BindVertexArray(0);
             }
         }
         public void Initialize(AutoArray<GameLine> lines)

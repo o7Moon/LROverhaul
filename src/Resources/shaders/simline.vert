@@ -1,21 +1,27 @@
-#version 120
+#version 330 core
 uniform vec4 u_color;
 uniform bool u_overlay;
 uniform float u_scale;
+layout(std140) uniform Matrices 
+{
+    mat4 projection;
+    mat4 modelview;
+    mat4 mvp;
+};
 
-attribute vec2 in_vertex;
-attribute vec2 in_circle;
-attribute float in_selectflags;
-attribute vec4 in_color;
-attribute vec2 in_linesize;
+in vec2 in_vertex;
+in vec2 in_circle;
+in float in_selectflags;
+in vec4 in_color;
+in vec2 in_linesize;
 
-varying vec2 v_circle;
-varying vec2 v_linesize;
-varying vec4 v_color;
-varying float v_selectflags;
+out vec2 v_circle;
+out vec2 v_linesize;
+out vec4 v_color;
+out float v_selectflags;
 void main() 
 {
-    gl_Position = gl_ModelViewProjectionMatrix * vec4(in_vertex,0.0,1.0);
+    gl_Position = mvp * vec4(in_vertex,0.0,1.0);
     v_circle = in_circle;
     v_linesize = in_linesize;
     // Alpha channel is priority

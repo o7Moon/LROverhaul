@@ -29,10 +29,47 @@ namespace linerider.Drawing
         private readonly Shader _shader;
         public float Scale = 1.0f;
         public int knobstate = 0;
+        private readonly GLBuffer<LineVertex> _vbo;
+        private readonly int _vao;
         public ErrorCode Error => GL.GetError();
         public LineVAO()
         {
             _shader = Shaders.LineShader;
+            _vao = GL.GenVertexArray();
+            _vbo = new GLBuffer<LineVertex>(BufferTarget.ArrayBuffer);
+            GL.BindVertexArray(_vao);
+            _vbo.Bind();
+
+            int in_vertex = _shader.GetAttrib("in_vertex");
+            int in_color = _shader.GetAttrib("in_color");
+            int in_circle = _shader.GetAttrib("in_circle");
+            int in_selectflags = _shader.GetAttrib("in_selectflags");
+            int in_linesize = _shader.GetAttrib("in_linesize");
+            GL.EnableVertexAttribArray(in_vertex);
+            GL.EnableVertexAttribArray(in_color);
+            GL.EnableVertexAttribArray(in_circle);
+            GL.EnableVertexAttribArray(in_selectflags);
+            GL.EnableVertexAttribArray(in_linesize);
+            int counter = 0;
+            GL.VertexAttribPointer(in_vertex, 2, VertexAttribPointerType.Float, false, LineVertex.Size, counter);
+            counter += 8;
+            GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, LineVertex.Size, counter);
+            counter += 4;
+            GL.VertexAttribPointer(in_circle, 2, VertexAttribPointerType.Byte, false, LineVertex.Size, counter);
+            counter += 2;
+            GL.VertexAttribPointer(in_selectflags, 1, VertexAttribPointerType.Byte, false, LineVertex.Size, counter);
+            counter += 2;
+            GL.VertexAttribPointer(in_linesize, 2, VertexAttribPointerType.Float, false, LineVertex.Size, counter);
+            
+            GL.BindVertexArray(0);
+            _vbo.Unbind();
+        }
+        private void EnsureBufferSize(int size)
+        {
+            if (_vbo.BufferSize < size)
+            {
+                _vbo.SetSize(size * 2, BufferUsageHint.StreamDraw);
+            }
         }
         public void AddLine(
             Vector2d start,
@@ -50,8 +87,12 @@ namespace linerider.Drawing
         }
         protected override void BeginDraw()
         {
+            _vbo.Bind();
+            GL.BindVertexArray(_vao);
+            EnsureBufferSize(Array.Count);
+            _vbo.SetData(Array.unsafe_array, 0, 0, Array.Count);
             _shader.Use();
-            int in_vertex = _shader.GetAttrib("in_vertex");
+            /*int in_vertex = _shader.GetAttrib("in_vertex");
             int in_color = _shader.GetAttrib("in_color");
             int in_circle = _shader.GetAttrib("in_circle");
             int in_linesize = _shader.GetAttrib("in_linesize");
@@ -68,7 +109,7 @@ namespace linerider.Drawing
                 GL.VertexAttribPointer(in_circle, 2, VertexAttribPointerType.Byte, false, LineVertex.Size, (IntPtr)ptr2);
                 GL.VertexAttribPointer(in_linesize, 2, VertexAttribPointerType.Float, false, LineVertex.Size, (IntPtr)ptr3);
                 GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, LineVertex.Size, (IntPtr)ptr4);
-            }
+            }*/
             int u_color = _shader.GetUniform("u_color");
             int u_scale = _shader.GetUniform("u_scale");
             int u_knobstate = _shader.GetUniform("u_knobstate");
@@ -81,8 +122,8 @@ namespace linerider.Drawing
         }
         protected override void InternalDraw(PrimitiveType primitive)
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            //GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.DrawArrays(primitive, 0, Array.Count);
@@ -90,11 +131,13 @@ namespace linerider.Drawing
         }
         protected override void EndDraw()
         {
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_vertex"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_color"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_circle"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_linesize"));
+            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_vertex"));
+            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_color"));
+            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_circle"));
+            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_linesize"));
             _shader.Stop();
+            GL.BindVertexArray(0);
+            _vbo.Unbind();
         }
     }
 }

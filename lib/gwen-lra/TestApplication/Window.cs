@@ -193,11 +193,11 @@ namespace TestApplication
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             GL.Viewport(new Rectangle(0, 0, ClientSize.Width, ClientSize.Height));
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(0, ClientSize.Width, ClientSize.Height, 0, 0, 1);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
+            GameDrawingMatrix.UniformBlock.MatrixMode(MatrixMode.Projection);
+            GameDrawingMatrix.UniformBlock.LoadIdentity();
+            GameDrawingMatrix.UniformBlock.Ortho(0, ClientSize.Width, ClientSize.Height, 0, 0, 1);
+            GameDrawingMatrix.UniformBlock.MatrixMode(MatrixMode.Modelview);
+            GameDrawingMatrix.UniformBlock.LoadIdentity();
 
             Canvas.RenderCanvas();
             Canvas.ShouldDrawBackground = true;

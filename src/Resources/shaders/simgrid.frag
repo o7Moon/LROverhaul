@@ -1,10 +1,12 @@
-#version 120
+#version 330 core
 
 uniform float u_zoom; // The current track zoom (needed to calculate the separation of neighbouring pixels)
 uniform float u_cellsize; // The size of individual grid cells
 
-varying vec2 world_position;
-varying vec2 pixel_coord;
+in vec2 world_position;
+in vec2 pixel_coord;
+
+out vec4 FragColor;
 
 float grid_alph(vec2 pos, float res) // Returns (one minus) the alpha value of a given position based on its proximity to the grid
 {
@@ -17,5 +19,5 @@ void main()
 	float alpha = 1.0 - grid_alph(world_position, 1.0);
 
     vec4 color = vec4(1.0, 0.0, 0.0, alpha);
-    gl_FragColor = color;
+    FragColor = color;
 }

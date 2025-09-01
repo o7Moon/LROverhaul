@@ -88,25 +88,28 @@ namespace linerider.Rendering
             return ret;
         }
 
-        public static void DrawTexture(int tex, DoubleRect rect, float alpha = 1, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
+        public static void DrawTexture(int tex, DoubleRect rect, float alpha = 1, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1, byte r = 255, byte g = 255, byte b = 255)
         {
-            GenericVAO buf = new();
+            GenericVAO buf = GameRenderer.GetGenericVAO();
+            buf.useTexture = true;
             Vector2d tr = new(rect.Right, rect.Top);
             Vector2d tl = new(rect.Left, rect.Top);
             Vector2d bl = new(rect.Left, rect.Bottom);
             Vector2d br = new(rect.Right, rect.Bottom);
-            Color c = Color.FromArgb((int)Math.Min(255, alpha * 255), 255, 255, 255);
+            Color c = Color.FromArgb((int)Math.Min(255, alpha * 255), r, g, b);
             buf.AddVertex(new GenericVertex((Vector2)tl, c, u1, v1));
             buf.AddVertex(new GenericVertex((Vector2)tr, c, u2, v1));
-            buf.AddVertex(new GenericVertex((Vector2)br, c, u2, v2));
             buf.AddVertex(new GenericVertex((Vector2)bl, c, u1, v2));
-            using (new GLEnableCap(EnableCap.Texture2D))
+            buf.AddVertex(new GenericVertex((Vector2)br, c, u2, v2));
+            //using (new GLEnableCap(EnableCap.Texture2D))
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.BindTexture(TextureTarget.Texture2D, tex);
-                buf.Draw(PrimitiveType.Quads);
+                buf.Draw(PrimitiveType.TriangleStrip);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
             }
+
+            buf.useTexture = false;
         }
         public static void DrawTexture(int tex, RectangleF rect, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1) => DrawTexture(tex, new DoubleRect(rect.Left, rect.Top, rect.Width, rect.Height), 1, u1, v1, u2, v2);
 
@@ -222,13 +225,19 @@ namespace linerider.Rendering
         public static void RenderRect(RectangleF rect, Color color)
         {
             GL.Enable(EnableCap.Blend);
-            GL.Begin(PrimitiveType.Quads);
+            GenericVAO gvao = GameRenderer.GetGenericVAO();
+            gvao.AddVertex(new GenericVertex(new Vector2(rect.Left, rect.Top), color));
+            gvao.AddVertex(new GenericVertex(new Vector2(rect.Left + rect.Width, rect.Top), color));
+            gvao.AddVertex(new GenericVertex(new Vector2(rect.Left, rect.Top + rect.Height), color));
+            gvao.AddVertex(new GenericVertex(new Vector2(rect.Left + rect.Width, rect.Top + rect.Height), color));
+            /*GL.Begin(PrimitiveType.Quads);
             GL.Color4(color.R, color.G, color.B, color.A);
             GL.Vertex2(new Vector2(rect.Left, rect.Top));
             GL.Vertex2(new Vector2(rect.Left + rect.Width, rect.Top));
             GL.Vertex2(new Vector2(rect.Left + rect.Width, rect.Top + rect.Height));
             GL.Vertex2(new Vector2(rect.Left, rect.Top + rect.Height));
-            GL.End();
+            GL.End();*/
+            gvao.Draw(PrimitiveType.TriangleStrip);
         }
     }
 }

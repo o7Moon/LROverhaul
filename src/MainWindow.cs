@@ -230,24 +230,24 @@ namespace linerider
 
                 if (Settings.DrawFloatGrid)
                 {
-                    //GameRenderer.DrawFloatGrid();
+                    GameRenderer.DrawFloatGrid();
                 }
 
                 if ((InputUtils.Check(Hotkey.PreferenceDrawDebugGrid) && !TrackRecorder.Recording) || Settings.DrawCollisionGrid)
                 {
-                    //GameRenderer.DbgDrawGrid();
+                    GameRenderer.DbgDrawGrid();
                 }
 
                 if ((InputUtils.Check(Hotkey.PreferenceDrawDebugGrid) && !TrackRecorder.Recording) || Settings.DrawAGWs)
                 {
-                    //GameRenderer.DrawAGWs();
+                    GameRenderer.DrawAGWs();
                 }
 
-                //Track.Render(blend);
+                Track.Render(blend);
 
                 if ((InputUtils.Check(Hotkey.PreferenceDrawDebugCamera) && !TrackRecorder.Recording) || Settings.DrawCamera)
                 {
-                    //GameRenderer.DbgDrawCamera();
+                    GameRenderer.DbgDrawCamera();
                 }
 
                 Canvas.RenderCanvas();
@@ -764,11 +764,11 @@ namespace linerider
             {
                 //GL.Viewport(new Rectangle(0, 0, RenderSize.Width, RenderSize.Height));
                 GL.Viewport(0, 0, RenderSize.Width, RenderSize.Height);
-                //GL.MatrixMode(MatrixMode.Projection);
-                //GL.LoadIdentity();
-                //GL.Ortho(0, RenderSize.Width, RenderSize.Height, 0, 0, 1);
-                //GL.MatrixMode(MatrixMode.Modelview);
-                //GL.LoadIdentity();
+                GameDrawingMatrix.UniformBlock.MatrixMode(GameDrawingMatrix.UniformBlock.Mode.Projection);
+                GameDrawingMatrix.UniformBlock.LoadIdentity();
+                GameDrawingMatrix.UniformBlock.Ortho(0, RenderSize.Width,  RenderSize.Height, 0, 0, 1);
+                GameDrawingMatrix.UniformBlock.MatrixMode(GameDrawingMatrix.UniformBlock.Mode.ModelView);
+                GameDrawingMatrix.UniformBlock.LoadIdentity();
             }
         }
         private void RegisterHotkeys()

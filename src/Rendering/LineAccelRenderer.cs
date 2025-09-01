@@ -22,15 +22,32 @@ namespace linerider.Rendering
         private const int nullindex = 0;
         private readonly GLBuffer<GenericVertex> _accelbuffer;
         private readonly GLBuffer<int> _accelibo;
+        private readonly int _vao;
         public LineAccelRenderer()
         {
+            _vao = GL.GenVertexArray();
             _accelbuffer = new GLBuffer<GenericVertex>(BufferTarget.ArrayBuffer);
+            GL.BindVertexArray(_vao);
+            
             _accelbuffer.Bind();
             _accelbuffer.SetSize(LineRenderer.StartingLineCount / 2 * 3, BufferUsageHint.DynamicDraw, false);
-            _accelbuffer.Unbind();
+            
             _accelibo = new GLBuffer<int>(BufferTarget.ElementArrayBuffer);
             _accelibo.Bind();
             _accelibo.SetSize(LineRenderer.StartingLineCount / 2 * 3, BufferUsageHint.DynamicDraw, false);
+            
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, GenericVertex.Size, 0);
+            
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, GenericVertex.Size, 8);
+            
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, GenericVertex.Size, 12);
+            
+            GL.BindVertexArray(0);
+            
+            _accelbuffer.Unbind();
             _accelibo.Unbind();
         }
 
@@ -83,21 +100,23 @@ namespace linerider.Rendering
         }
         public void Draw(DrawOptions draw)
         {
-            _accelbuffer.Bind();
+            //_accelbuffer.Bind();
+            GL.BindVertexArray(_vao);
+            Shaders.GenericShader.Use();
+            //GL.EnableClientState(ArrayCap.VertexArray);
+            //GL.EnableClientState(ArrayCap.ColorArray);
+            //GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, 0);
+            //GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
 
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.EnableClientState(ArrayCap.ColorArray);
-            GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, 0);
-            GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
-
-            _accelibo.Bind();
+            //_accelibo.Bind();
             GL.DrawElements(PrimitiveType.Triangles, _indices.Count, DrawElementsType.UnsignedInt, 0);
-            _accelibo.Unbind();
+            //_accelibo.Unbind();
 
-            GL.DisableClientState(ArrayCap.ColorArray);
-            GL.DisableClientState(ArrayCap.VertexArray);
-
-            _accelbuffer.Unbind();
+            //GL.DisableClientState(ArrayCap.ColorArray);
+            //GL.DisableClientState(ArrayCap.VertexArray);
+            Shaders.GenericShader.Stop();
+            GL.BindVertexArray(0);
+            //_accelbuffer.Unbind();
         }
         public void Clear()
         {
