@@ -19,7 +19,12 @@ namespace linerider.UI
             get
             {
                 if (OperatingSystem.IsMacOS())
-                    return $"{Constants.FfmpegHelperHeader}-mac.zip";
+                {
+                    if (System.Runtime.InteropServices.RuntimeInformation.OSArchitecture ==
+                        System.Runtime.InteropServices.Architecture.X64)
+                        return $"{Constants.FfmpegHelperHeader}-intel-mac.zip";
+                    else return $"{Constants.FfmpegHelperHeader}-mac.zip";
+                }
                 else if (OperatingSystem.IsWindows())
                     return $"{Constants.FfmpegHelperHeader}-win.zip";
                 else if (OperatingSystem.IsLinux())
