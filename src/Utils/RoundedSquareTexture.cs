@@ -64,7 +64,7 @@ namespace linerider.Utils
         {
             int radius = _stretchHorizontally || _stretchVertically ? Radius - 1 : Radius;
 
-            SKBitmap bitmap = new(_width + radius, _height + radius);
+            SKBitmap bitmap = new(_width + radius, _height + radius, SKColorType.Bgra8888, SKAlphaType.Unpremul);
             SKPaint paint = new()
             {
                 Color = Color.White

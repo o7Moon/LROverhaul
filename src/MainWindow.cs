@@ -105,7 +105,7 @@ namespace linerider
         private bool _invalidated;
         private Rectangle _previouswindowpos;
 
-        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.Debug, Profile = ContextProfile.Core, APIVersion = new Version(3, 3) })
+        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.ForwardCompatible, Profile = ContextProfile.Core, APIVersion = new Version(3, 3) })
         {
             Size = new Vector2i(Constants.WindowSize.Width, Constants.WindowSize.Height);
             Location = new Vector2i(
@@ -126,7 +126,7 @@ namespace linerider
             RegisterHotkeys();
             if (Settings.startWindowMaximized)
                 WindowState = WindowState.Maximized;
-            GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
+            //GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
         }
 
         private static DebugProc DebugMessageDelegate = OnGLDebugMessage;

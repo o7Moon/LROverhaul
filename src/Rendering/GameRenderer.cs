@@ -482,8 +482,8 @@ namespace linerider.Rendering
 
         public static unsafe void DrawFloatGrid() // Draws the grid of floating-point 'regions', used in the creation of stable angled kramuals
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, GridVBO);
             GL.BindVertexArray(GridVAO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, GridVBO);
             Shader _shader = Shaders.FloatGridShader;
             _shader.Use();
 
@@ -518,14 +518,13 @@ namespace linerider.Rendering
             GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
             _shader.Stop();
             GL.BindVertexArray(0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GameDrawingMatrix.UniformBlock.PopMatrix();
         }
 
         public static unsafe void DrawGrid_Shader(int sqsize) // Draw the grid using per-pixel shading (more efficient for low zoom where more grid-lines are needed)
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, GridVBO);
             GL.BindVertexArray(GridVAO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, GridVBO);
             Shader _shader = Shaders.SimGridShader;
             _shader.Use();
 
@@ -561,7 +560,6 @@ namespace linerider.Rendering
             GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
             _shader.Stop();
             GL.BindVertexArray(0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GameDrawingMatrix.UniformBlock.PopMatrix();
         }
 
@@ -681,10 +679,10 @@ namespace linerider.Rendering
                     }
                 }
             }
-
+            
             //GL.End();
             gvao.Draw(PrimitiveType.Triangles);
-
+            
             if (!useshadergrid)
             {
                 gvao = GetGenericVAO();

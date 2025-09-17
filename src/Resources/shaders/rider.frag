@@ -18,17 +18,17 @@ void main()
     if (v_unit == 0.0)
         color = vec4(1.0, 1.0, 1.0, 1.0);
     else if (v_unit == 1.0)
-        color = texture2D(u_bodytex, v_texcoord);
+        color = texture(u_bodytex, v_texcoord);
     else if (v_unit == 2.0)
-        color = texture2D(u_bodydeadtex, v_texcoord);
+        color = texture(u_bodydeadtex, v_texcoord);
     else if (v_unit == 3.0)
-        color = texture2D(u_armtex, v_texcoord);
+        color = texture(u_armtex, v_texcoord);
     else if (v_unit == 4.0)
-        color = texture2D(u_legtex, v_texcoord);
+        color = texture(u_legtex, v_texcoord);
     else if (v_unit == 5.0)
-        color = texture2D(u_sledtex, v_texcoord);
+        color = texture(u_sledtex, v_texcoord);
     else if (v_unit == 6.0)
-        color = texture2D(u_sledbrokentex, v_texcoord);
+        color = texture(u_sledbrokentex, v_texcoord);
     else
         color = vec4(1.0, 0.0, 0.0, 1.0); // Invalid, show red
     FragColor = color * v_color;
