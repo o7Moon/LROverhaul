@@ -223,7 +223,7 @@ namespace linerider
                     Constants.TriggerLineColorChange = Settings.Computed.LineColor;
                 }
 
-                MSAABuffer.Use(RenderSize.Width, RenderSize.Height);
+                MSAABuffer.Use(FramebufferSize.X, FramebufferSize.Y);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Enable(EnableCap.Blend);
@@ -763,7 +763,7 @@ namespace linerider
             if (RenderSize.Height > 0 && RenderSize.Width > 0)
             {
                 //GL.Viewport(new Rectangle(0, 0, RenderSize.Width, RenderSize.Height));
-                GL.Viewport(0, 0, RenderSize.Width, RenderSize.Height);
+                GL.Viewport(0, 0, FramebufferSize.X, FramebufferSize.Y);
                 GameDrawingMatrix.UniformBlock.MatrixMode(GameDrawingMatrix.UniformBlock.Mode.Projection);
                 GameDrawingMatrix.UniformBlock.LoadIdentity();
                 GameDrawingMatrix.UniformBlock.Ortho(0, RenderSize.Width,  RenderSize.Height, 0, 0, 1);
