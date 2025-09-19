@@ -16,6 +16,8 @@ namespace Gwen.Input
         private int m_MouseX = 0;
         private int m_MouseY = 0;
 
+        public float Scale = 1;
+
         #endregion Properties
 
         #region Constructors
@@ -64,11 +66,11 @@ namespace Gwen.Input
             if (args is MouseMoveEventArgs)
             {
                 MouseMoveEventArgs ev = (MouseMoveEventArgs)args;// as MouseMoveEventArgs;
-                int dx = (int)ev.X - m_MouseX;
-                int dy = (int)ev.Y - m_MouseY;
+                int dx = (int)(ev.X * Scale) - m_MouseX;
+                int dy = (int)(ev.Y * Scale) - m_MouseY;
 
-                m_MouseX = (int)ev.X;
-                m_MouseY = (int)ev.Y;
+                m_MouseX = (int)(ev.X * Scale);
+                m_MouseY = (int)(ev.Y * Scale);
 
                 return m_Canvas.Input_MouseMoved(m_MouseX, m_MouseY, dx, dy);
             }

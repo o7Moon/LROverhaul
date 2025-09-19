@@ -105,6 +105,8 @@ namespace linerider
         private bool _invalidated;
         private Rectangle _previouswindowpos;
 
+        public static float MonitorScale = 1.0f;
+
         public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Flags = ContextFlags.ForwardCompatible, Profile = ContextProfile.Core, APIVersion = new Version(3, 3) })
         {
             Size = new Vector2i(Constants.WindowSize.Width, Constants.WindowSize.Height);
@@ -126,6 +128,11 @@ namespace linerider
             RegisterHotkeys();
             if (Settings.startWindowMaximized)
                 WindowState = WindowState.Maximized;
+            
+            float x;
+            float y;
+            TryGetCurrentMonitorScale(out x, out y);
+            MonitorScale = x;
             //GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
         }
 
@@ -403,6 +410,7 @@ namespace linerider
 
             _input = new Gwen.Input.OpenTK(this);
             _input.Initialize(Canvas);
+            _input.Scale = MonitorScale;
             Canvas.ShouldDrawBackground = false;
 
             Cursors.Reload();
@@ -420,8 +428,8 @@ namespace linerider
             Track.Camera.OnResize();
             try
             {
-                Canvas.SetCanvasSize(RenderSize.Width, RenderSize.Height);
-                Canvas.Renderer.Ortho = Matrix4.Mult(Matrix4.CreateOrthographic(RenderSize.Width, -RenderSize.Height, 0, 1), Matrix4.CreateTranslation(-1f, 1f, 0));
+                Canvas.SetCanvasSize(FramebufferSize.X, FramebufferSize.Y);
+                Canvas.Renderer.Ortho = Matrix4.Mult(Matrix4.CreateOrthographic(FramebufferSize.X, -FramebufferSize.Y, 0, 1), Matrix4.CreateTranslation(-1f, 1f, 0));
             }
             catch (Exception ex)
             {
