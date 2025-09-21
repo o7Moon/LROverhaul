@@ -91,7 +91,7 @@ namespace linerider.IO
             using TrackReader trk = game.Track.CreateTrackReader();
             RecordingScreenshot = true;
 
-            game.Canvas.SetCanvasSize(game.RenderSize.Width, game.RenderSize.Height);
+            game.Canvas.SetCanvasSize((int)(game.RenderSize.Width * MainWindow.MonitorScale), (int)(game.RenderSize.Height * MainWindow.MonitorScale));
             game.Canvas.Layout();
 
             int frontbuffer = SafeFrameBuffer.GenFramebuffer();
@@ -129,8 +129,9 @@ namespace linerider.IO
             Settings.Local.RecordingMode = recmodesave;
             Settings.Editor.HitTest = oldHitTest;
 
-            _ = game.Canvas.SetSize(game.RenderSize.Width, game.RenderSize.Height);
             game.Canvas.Scale = 1.0f;
+            game.Canvas.SetCanvasSize(game.FramebufferSize.X, game.FramebufferSize.Y);
+            
             _screenshotbuffer = null;
         }
 
@@ -165,7 +166,7 @@ namespace linerider.IO
 
             Game.Rider state = game.Track.GetStart();
             int frame = Settings.LockTrackDuration ? game.Canvas.TrackDuration : flag.Moment.Frame;
-            game.Canvas.SetCanvasSize(game.RenderSize.Width, game.RenderSize.Height);
+            game.Canvas.SetCanvasSize((int)(game.RenderSize.Width * MainWindow.MonitorScale), (int)(game.RenderSize.Height * MainWindow.MonitorScale));
             game.Canvas.Layout();
 
             if (frame > 400) // Many frames, will likely lag the game. Update the window as a fallback.
@@ -427,8 +428,9 @@ namespace linerider.IO
             Settings.Editor.HitTest = oldHitTest;
             game.Track.Zoom = oldZoom;
 
-            _ = game.Canvas.SetSize(game.RenderSize.Width, game.RenderSize.Height);
             game.Canvas.Scale = 1.0f;
+            game.Canvas.SetCanvasSize(game.FramebufferSize.X, game.FramebufferSize.Y);
+            
             _screenshotbuffer = null;
 
             game.Track.Stop();
