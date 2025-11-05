@@ -260,6 +260,15 @@ namespace linerider.Game
                 }
             }
 
+	        Vector2d nose = body[RiderConstants.SledTR].Location - body[RiderConstants.SledTL].Location;
+            Vector2d tail = body[RiderConstants.SledBL].Location - body[RiderConstants.SledTL].Location;
+            Vector2d head = body[RiderConstants.BodyShoulder].Location - body[RiderConstants.BodyButt].Location;
+            if (nose.X * tail.Y - nose.Y * tail.X < 0 || // Tail fakie
+                nose.X * head.Y - nose.Y * head.X > 0)   // Head fakie
+            {
+                return false;
+            }
+
             return true; // If none of Bosh's bones are unsurvivable, the state survives so return true
         }
 
@@ -296,7 +305,7 @@ namespace linerider.Game
                 case 2: // Dismounted (dead & can remount)
                     if (TestSurvivable(bones, body, 2.0))
                     {
-                        if (rTimer >= 3) // If Bosh has been within 2x endurance range for 3 consecutive frames, go to remounting phase
+                        if (rTimer >= 2) // If Bosh has been within 2x endurance range for 3 consecutive frames, go to remounting phase
                         {
                             rState = 3;
                             dead = false;
@@ -313,15 +322,15 @@ namespace linerider.Game
                     }
                     break;
                 case 3: // Remounting
-                    if (!TestSurvivable(bones, body, 2.0) || dead) // If Bosh can't survive with 2x endurance range, go back to dismounted phase (TODO check if this is redundant)
-                    {
-                        rState = 2;
-                        rTimer = 0;
-                        dead = true;
-                    }
+                    //if (!TestSurvivable(bones, body, 2.0) || dead) // If Bosh can't survive with 2x endurance range, go back to dismounted phase (TODO check if this is redundant)
+                    //{
+                    //    rState = 2;
+                    //    rTimer = 0;
+                    //    dead = true;
+                    //}
                     if (TestSurvivable(bones, body, 1.0))
                     {
-                        if (rTimer >= 3) // If Bosh has been within the standard endurance range for 3 consecutive frames, go to normal mounted phase
+                        if (rTimer >= 2) // If Bosh has been within the standard endurance range for 3 consecutive frames, go to normal mounted phase
                         {
                             rState = 0;
                             rTimer = 0;
@@ -339,12 +348,9 @@ namespace linerider.Game
             }
         }
 
-        public static unsafe void ProcessBones(Bone[] bones, SimulationPoint[] body, ref bool dead, ref int rState, List<int> breaks = null, int subiteration = RiderConstants.Subiterations)
+        public static unsafe void ProcessBones(Bone[] bones, SimulationPoint[] body, ref bool dead, ref int rState, ref int rTimer, List<int> breaks = null, int subiteration = RiderConstants.Subiterations)
         {
             int bonelen = bones.Length;
-
-            double strengthMult = rState == 3 ? RiderConstants.RemountStrengthMultiplier : 1.0;
-            double enduranceMult = rState == 3 ? RiderConstants.RemountEnduranceMultiplier : 1.0;
 
             for (int i = 0; i < bonelen; i++)
             {
@@ -359,6 +365,9 @@ namespace linerider.Game
                 Vector2d d = body[j1].Location - body[j2].Location;
                 double len = d.Length;
 
+		        double strengthMult = rState == 3 && bone.Breakable ? RiderConstants.RemountStrengthMultiplier : 1.0;
+                double enduranceMult = rState == 3 && bone.Breakable ? RiderConstants.RemountEnduranceMultiplier : 1.0;
+
                 if (!bone.OnlyRepel || len < bone.RestLength)
                 {
                     double scalar = (len - bone.RestLength) / len * 0.5;
@@ -370,6 +379,13 @@ namespace linerider.Game
                     }
                     if (bone.Breakable && (dead || scalar > bone.RestLength * RiderConstants.EnduranceFactor * enduranceMult))
                     {
+	    		        if (rState == 3) {
+	    	        	    rState = 2;
+	    	        	    rTimer = -1;
+	            		}
+    			        if (rState == 0) {
+			                rState = 1;
+			            }
                         dead = true;
                         breaks?.Add(i);
                     }
@@ -438,10 +454,10 @@ namespace linerider.Game
             {
                 for (int i = 0; i < maxiteration; i++)
                 {
-                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState);
+                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState, ref rTimer);
                     else
                     {
-                        ProcessBones(bones, body, ref dead, ref rState, subiteration: maxsubiteration);
+                        ProcessBones(bones, body, ref dead, ref rState, ref rTimer, subiteration: maxsubiteration);
                         if (maxsubiteration < RiderConstants.Subiterations)
                         {
                             skipRestOfFrame = true;
@@ -453,7 +469,7 @@ namespace linerider.Game
             }
             if (maxiteration == 6 && !skipRestOfFrame)
             {
-                Vector2d nose = body[RiderConstants.SledTR].Location - body[RiderConstants.SledTL].Location;
+                /*Vector2d nose = body[RiderConstants.SledTR].Location - body[RiderConstants.SledTL].Location;
                 Vector2d tail = body[RiderConstants.SledBL].Location - body[RiderConstants.SledTL].Location;
                 Vector2d head = body[RiderConstants.BodyShoulder].Location - body[RiderConstants.BodyButt].Location;
                 if (!dead && (nose.X * tail.Y - nose.Y * tail.X < 0 || // Tail fakie
@@ -461,6 +477,20 @@ namespace linerider.Game
                 {
                     dead = true;
                     sledbroken = true;
+                }*/ 
+
+                Vector2d nose = body[RiderConstants.SledTR].Location - body[RiderConstants.SledTL].Location;
+                Vector2d tail = body[RiderConstants.SledBL].Location - body[RiderConstants.SledTL].Location;
+                Vector2d head = body[RiderConstants.BodyShoulder].Location - body[RiderConstants.BodyButt].Location; 
+
+                if (nose.X * tail.Y - nose.Y * tail.X < 0 || // Tail fakie
+                    nose.X * head.Y - nose.Y * head.X > 0)   // Head fakie
+                {
+                    dead = true;
+                    if (nose.X * tail.Y - nose.Y * tail.X < 0) {
+                        sledbroken = true;
+                    }
+                    //sledbroken = true;
                 }
             }
 
@@ -551,6 +581,7 @@ namespace linerider.Game
             _ = Body.Length;
             bool dead = Crashed;
             int rState = remountState;
+	        int rTimer = remountTimer;
             RectLRTB phys = new(ref body[0]);
             bool skipRestOfFrame = false;
             List<int> breaks = [];
@@ -558,10 +589,10 @@ namespace linerider.Game
             {
                 for (int i = 0; i < maxiteration; i++)
                 {
-                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState, breaks);
+                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState, ref rTimer, breaks);
                     else
                     {
-                        ProcessBones(bones, body, ref dead, ref rState, breaks, maxsubiteration);
+                        ProcessBones(bones, body, ref dead, ref rState, ref rTimer, breaks, maxsubiteration);
                         if (maxsubiteration < RiderConstants.Subiterations)
                         {
                             skipRestOfFrame = true;

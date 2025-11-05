@@ -27,7 +27,7 @@ namespace linerider.Tools
 
         public const int MaxRedMultiplier = 3;
         public const int MinRedMultiplier = 1;
-        public const int MaxGreenMultiplier = 3;
+        public const int MaxGreenMultiplier = 25;
         public const float MinGreenMultiplier = 0.5f;
         public LineType Selected { get; set; } = LineType.Standard;
         public void IncrementSelectedMultiplier()
