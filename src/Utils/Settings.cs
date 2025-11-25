@@ -1,7 +1,7 @@
 ﻿//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
-//  Copyright (c) 2017 
+//  Copyright (c) 2017
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using linerider.UI;
-using linerider.Utils;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using linerider.UI;
+using linerider.Utils;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using Key = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 
 namespace linerider
@@ -34,13 +34,15 @@ namespace linerider
         public enum BezierMode
         {
             Direct = 0,
-            Trace = 1
+            Trace = 1,
         }
+
         public enum PlaybackZoomMode
         {
             AsIs = 0,
-            Frame = 1
+            Frame = 1,
         }
+
         public static class Recording
         {
             public static bool ShowTools = false;
@@ -52,6 +54,7 @@ namespace linerider
             public static int RecordingHeight = 0;
             public static bool ResIndZoom = true; // Use resolution-independent zoom based on window size when recording
         }
+
         public static class Local
         {
             public static string Version;
@@ -63,6 +66,7 @@ namespace linerider
             public static int TrackOverlayOffset = -1;
             public static bool LockCamera;
         }
+
         public static class Editor
         {
             public static bool ShowCoordinateMenu = false;
@@ -84,6 +88,7 @@ namespace linerider
             public static bool ShowLineID;
             public static bool NoHitSelect;
         }
+
         public static class Colors
         {
             public static Color ExportBg;
@@ -96,6 +101,7 @@ namespace linerider
             public static Color AccelerationLine;
             public static Color SceneryLine;
         }
+
         public static class Bezier
         {
             public static int Resolution;
@@ -108,6 +114,7 @@ namespace linerider
             public static int smoothStabilizer = 10;
             public static int smoothUpdateSpeed = 0;
         }
+
         public static PlaybackZoomMode PlaybackZoomType;
         public static float Volume;
         public static bool SuperZoom;
@@ -166,7 +173,7 @@ namespace linerider
         public static int autosaveMinutes; // Amount of minues per autosave
         public static string AutosavePrefix; // Name of autosave file
         public static bool startWindowMaximized; // Start window maximized
-        public static string DefaultSaveFormat; // What the save menu auto picks 
+        public static string DefaultSaveFormat; // What the save menu auto picks
         public static string DefaultAutosaveFormat; // What the autosave format is
         public static string DefaultQuicksaveFormat; // What the autosave format is
         public static string DefaultCrashBackupFormat; // Format crash backups are saved to
@@ -192,15 +199,23 @@ namespace linerider
         {
             get
             {
-                if (!string.IsNullOrEmpty(_lastSelectedTrack) && _lastSelectedTrack.StartsWith(Constants.LastTrackRelativePrefix))
-                    return Path.Combine(Local.UserDirPath, _lastSelectedTrack.Substring(Constants.LastTrackRelativePrefix.Length));
+                if (
+                    !string.IsNullOrEmpty(_lastSelectedTrack)
+                    && _lastSelectedTrack.StartsWith(Constants.LastTrackRelativePrefix)
+                )
+                    return Path.Combine(
+                        Local.UserDirPath,
+                        _lastSelectedTrack.Substring(Constants.LastTrackRelativePrefix.Length)
+                    );
                 else
                     return _lastSelectedTrack;
             }
             set
             {
                 if (!string.IsNullOrEmpty(value) && value.StartsWith(Local.UserDirPath))
-                    _lastSelectedTrack = Constants.LastTrackRelativePrefix + value.Substring(Local.UserDirPath.Length);
+                    _lastSelectedTrack =
+                        Constants.LastTrackRelativePrefix
+                        + value.Substring(Local.UserDirPath.Length);
                 else
                     _lastSelectedTrack = value;
             }
@@ -212,13 +227,16 @@ namespace linerider
         // Computed settings
         public static class Computed
         {
-            public static float MaxZoom => SuperZoom ? Constants.MaximumSuperZoom : Constants.MaximumZoom;
-            public static double UIScale => Settings.UIScale > 0 ? Settings.UIScale : (float)Constants.ScreenScale;
+            public static float MaxZoom =>
+                SuperZoom ? Constants.MaximumSuperZoom : Constants.MaximumZoom;
+            public static double UIScale =>
+                Settings.UIScale > 0 ? Settings.UIScale : (float)Constants.ScreenScale;
             public static Color BGColor => NightMode ? Colors.EditorNightBg : Colors.EditorBg;
             public static Color LineColor => NightMode ? Colors.EditorNightLine : Colors.EditorLine;
-            public static bool LockCamera => Local.RecordingMode ? false : Local.LockCamera;
+            public static bool LockCamera => true; //Local.RecordingMode ? false : Local.LockCamera;
             public static bool IsUserDirPortable => Local.UserDirPath != Program.UserDirectory;
-            public static int DefaultTimelineLength => Settings.DefaultTimelineLength * Constants.PhysicsRate;
+            public static int DefaultTimelineLength =>
+                Settings.DefaultTimelineLength * Constants.PhysicsRate;
         }
 
         static Settings()
@@ -231,7 +249,7 @@ namespace linerider
                 KeybindConflicts.Add(hk, KeyConflicts.General);
                 Keybinds.Add(hk, []);
             }
-            // Conflicts, for keybinds that depend on a state, so keybinds 
+            // Conflicts, for keybinds that depend on a state, so keybinds
             // outside of its state can be set as long
             // as its dependant state (general) doesnt have a keybind set
             KeybindConflicts[Hotkey.PlaybackZoom] = KeyConflicts.Playback;
@@ -267,6 +285,7 @@ namespace linerider
             KeybindConflicts[Hotkey.ToolScaleAspectRatio] = KeyConflicts.HardCoded;
             SetupDefaultKeybinds();
         }
+
         public static void RestoreDefaultSettings()
         {
             Editor.HitTest = false;
@@ -364,6 +383,7 @@ namespace linerider
             ZoomMultiplier = 1.0f;
             InvisibleRider = false;
         }
+
         public static void ResetKeybindings()
         {
             foreach (KeyValuePair<Hotkey, List<Keybinding>> kb in Keybinds)
@@ -372,6 +392,7 @@ namespace linerider
             }
             LoadDefaultKeybindings();
         }
+
         private static void SetupDefaultKeybinds()
         {
             SetupAddonDefaultKeybinds();
@@ -396,8 +417,14 @@ namespace linerider
             SetupDefaultKeybind(Hotkey.EditorFocusFlag, new Keybinding(Key.F2));
             SetupDefaultKeybind(Hotkey.ToolLifeLock, new Keybinding(KeyModifiers.Alt));
             SetupDefaultKeybind(Hotkey.ToolAngleLock, new Keybinding(KeyModifiers.Shift));
-            SetupDefaultKeybind(Hotkey.ToolAxisLock, new Keybinding(KeyModifiers.Control | KeyModifiers.Shift));
-            SetupDefaultKeybind(Hotkey.ToolPerpendicularAxisLock, new Keybinding(Key.X, KeyModifiers.Control | KeyModifiers.Shift));
+            SetupDefaultKeybind(
+                Hotkey.ToolAxisLock,
+                new Keybinding(KeyModifiers.Control | KeyModifiers.Shift)
+            );
+            SetupDefaultKeybind(
+                Hotkey.ToolPerpendicularAxisLock,
+                new Keybinding(Key.X, KeyModifiers.Control | KeyModifiers.Shift)
+            );
             SetupDefaultKeybind(Hotkey.ToolLengthLock, new Keybinding(Key.L));
             SetupDefaultKeybind(Hotkey.ToolXYSnap, new Keybinding(Key.X));
             SetupDefaultKeybind(Hotkey.ToolToggleSnap, new Keybinding(Key.S));
@@ -405,9 +432,11 @@ namespace linerider
             SetupDefaultKeybind(Hotkey.LineToolFlipLine, new Keybinding(KeyModifiers.Shift));
             SetupDefaultKeybind(Hotkey.EditorUndo, new Keybinding(Key.Z, KeyModifiers.Control));
 
-            SetupDefaultKeybind(Hotkey.EditorRedo,
+            SetupDefaultKeybind(
+                Hotkey.EditorRedo,
                 new Keybinding(Key.Y, KeyModifiers.Control),
-                new Keybinding(Key.Z, KeyModifiers.Control | KeyModifiers.Shift));
+                new Keybinding(Key.Z, KeyModifiers.Control | KeyModifiers.Shift)
+            );
 
             SetupDefaultKeybind(Hotkey.CopyX0, new Keybinding(Key.KeyPad0, KeyModifiers.Alt));
             SetupDefaultKeybind(Hotkey.CopyY0, new Keybinding(Key.KeyPad0, KeyModifiers.Control));
@@ -430,9 +459,18 @@ namespace linerider
             SetupDefaultKeybind(Hotkey.CopyX9, new Keybinding(Key.KeyPad9, KeyModifiers.Alt));
             SetupDefaultKeybind(Hotkey.CopyY9, new Keybinding(Key.KeyPad9, KeyModifiers.Control));
 
-            SetupDefaultKeybind(Hotkey.PlaybackStartIgnoreFlag, new Keybinding(Key.Y, KeyModifiers.Alt));
-            SetupDefaultKeybind(Hotkey.PlaybackStartGhostFlag, new Keybinding(Key.I, KeyModifiers.Shift));
-            SetupDefaultKeybind(Hotkey.PlaybackStartSlowmo, new Keybinding(Key.Y, KeyModifiers.Shift));
+            SetupDefaultKeybind(
+                Hotkey.PlaybackStartIgnoreFlag,
+                new Keybinding(Key.Y, KeyModifiers.Alt)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackStartGhostFlag,
+                new Keybinding(Key.I, KeyModifiers.Shift)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackStartSlowmo,
+                new Keybinding(Key.Y, KeyModifiers.Shift)
+            );
             SetupDefaultKeybind(Hotkey.PlaybackFlag, new Keybinding(Key.I));
             SetupDefaultKeybind(Hotkey.PlaybackStart, new Keybinding(Key.Y));
             SetupDefaultKeybind(Hotkey.PlaybackStop, new Keybinding(Key.U));
@@ -440,38 +478,83 @@ namespace linerider
             SetupDefaultKeybind(Hotkey.PlaybackZoom, new Keybinding(Key.Z));
             SetupDefaultKeybind(Hotkey.PlaybackUnzoom, new Keybinding(Key.X));
 
-            SetupDefaultKeybind(Hotkey.PlaybackSpeedUp,
+            SetupDefaultKeybind(
+                Hotkey.PlaybackSpeedUp,
                 new Keybinding(Key.Equal),
-                new Keybinding(Key.KeyPadAdd));
+                new Keybinding(Key.KeyPadAdd)
+            );
 
-            SetupDefaultKeybind(Hotkey.PlaybackSpeedDown,
+            SetupDefaultKeybind(
+                Hotkey.PlaybackSpeedDown,
                 new Keybinding(Key.Minus),
-                new Keybinding(Key.KeyPadSubtract));
+                new Keybinding(Key.KeyPadSubtract)
+            );
 
             SetupDefaultKeybind(Hotkey.PlaybackFrameNext, new Keybinding(Key.Right));
             SetupDefaultKeybind(Hotkey.PlaybackFramePrev, new Keybinding(Key.Left));
-            SetupDefaultKeybind(Hotkey.PlaybackForward, new Keybinding(Key.Right, KeyModifiers.Shift));
-            SetupDefaultKeybind(Hotkey.PlaybackBackward, new Keybinding(Key.Left, KeyModifiers.Shift));
-            SetupDefaultKeybind(Hotkey.PlaybackIterationNext, new Keybinding(Key.Right, KeyModifiers.Alt));
-            SetupDefaultKeybind(Hotkey.PlaybackIterationPrev, new Keybinding(Key.Left, KeyModifiers.Alt));
-            SetupDefaultKeybind(Hotkey.PlaybackSubiterationNext, new Keybinding(Key.Right, KeyModifiers.Control));
-            SetupDefaultKeybind(Hotkey.PlaybackSubiterationPrev, new Keybinding(Key.Left, KeyModifiers.Control));
+            SetupDefaultKeybind(
+                Hotkey.PlaybackForward,
+                new Keybinding(Key.Right, KeyModifiers.Shift)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackBackward,
+                new Keybinding(Key.Left, KeyModifiers.Shift)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackIterationNext,
+                new Keybinding(Key.Right, KeyModifiers.Alt)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackIterationPrev,
+                new Keybinding(Key.Left, KeyModifiers.Alt)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackSubiterationNext,
+                new Keybinding(Key.Right, KeyModifiers.Control)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PlaybackSubiterationPrev,
+                new Keybinding(Key.Left, KeyModifiers.Control)
+            );
             SetupDefaultKeybind(Hotkey.PlaybackTogglePause, new Keybinding(Key.Space));
 
-            SetupDefaultKeybind(Hotkey.PreferencesWindow,
-                new Keybinding(Key.P, KeyModifiers.Control));
-            SetupDefaultKeybind(Hotkey.TrackPropertiesWindow, new Keybinding(Key.T, KeyModifiers.Control));
+            SetupDefaultKeybind(
+                Hotkey.PreferencesWindow,
+                new Keybinding(Key.P, KeyModifiers.Control)
+            );
+            SetupDefaultKeybind(
+                Hotkey.TrackPropertiesWindow,
+                new Keybinding(Key.T, KeyModifiers.Control)
+            );
 
-            SetupDefaultKeybind(Hotkey.PreferenceAllCheckboxSettings, new Keybinding(Key.O, KeyModifiers.Shift | KeyModifiers.Control));
-            SetupDefaultKeybind(Hotkey.PreferenceInvisibleRider, new Keybinding(Key.I, KeyModifiers.Shift | KeyModifiers.Alt));
+            SetupDefaultKeybind(
+                Hotkey.PreferenceAllCheckboxSettings,
+                new Keybinding(Key.O, KeyModifiers.Shift | KeyModifiers.Control)
+            );
+            SetupDefaultKeybind(
+                Hotkey.PreferenceInvisibleRider,
+                new Keybinding(Key.I, KeyModifiers.Shift | KeyModifiers.Alt)
+            );
 
-            SetupDefaultKeybind(Hotkey.PreferenceOnionSkinning, new Keybinding(Key.O, KeyModifiers.Control));
-            SetupDefaultKeybind(Hotkey.TogglePreviewMode, new Keybinding(Key.U, KeyModifiers.Control));
-            SetupDefaultKeybind(Hotkey.ToggleCameraLock, new Keybinding(Key.L, KeyModifiers.Control));
+            SetupDefaultKeybind(
+                Hotkey.PreferenceOnionSkinning,
+                new Keybinding(Key.O, KeyModifiers.Control)
+            );
+            SetupDefaultKeybind(
+                Hotkey.TogglePreviewMode,
+                new Keybinding(Key.U, KeyModifiers.Control)
+            );
+            SetupDefaultKeybind(
+                Hotkey.ToggleCameraLock,
+                new Keybinding(Key.L, KeyModifiers.Control)
+            );
             SetupDefaultKeybind(Hotkey.LoadWindow, new Keybinding(Key.O));
             SetupDefaultKeybind(Hotkey.Quicksave, new Keybinding(Key.S, KeyModifiers.Control));
 
-            SetupDefaultKeybind(Hotkey.EditorQuickPan, new Keybinding(Key.Space, KeyModifiers.Shift));
+            SetupDefaultKeybind(
+                Hotkey.EditorQuickPan,
+                new Keybinding(Key.Space, KeyModifiers.Shift)
+            );
             SetupDefaultKeybind(Hotkey.EditorDragCanvas, new Keybinding(MouseButton.Middle));
 
             SetupDefaultKeybind(Hotkey.EditorCancelTool, new Keybinding(Key.Escape));
@@ -480,8 +563,14 @@ namespace linerider
             SetupDefaultKeybind(Hotkey.ToolCut, new Keybinding(Key.X, KeyModifiers.Control));
             SetupDefaultKeybind(Hotkey.ToolPaste, new Keybinding(Key.V, KeyModifiers.Control));
             SetupDefaultKeybind(Hotkey.ToolDelete, new Keybinding(Key.Delete));
-            SetupDefaultKeybind(Hotkey.ToolCopyValues, new Keybinding(Key.C, KeyModifiers.Shift | KeyModifiers.Control));
-            SetupDefaultKeybind(Hotkey.ToolPasteValues, new Keybinding(Key.V, KeyModifiers.Shift | KeyModifiers.Control));
+            SetupDefaultKeybind(
+                Hotkey.ToolCopyValues,
+                new Keybinding(Key.C, KeyModifiers.Shift | KeyModifiers.Control)
+            );
+            SetupDefaultKeybind(
+                Hotkey.ToolPasteValues,
+                new Keybinding(Key.V, KeyModifiers.Shift | KeyModifiers.Control)
+            );
             SetupDefaultKeybind(Hotkey.ToolSwitchBlue, new Keybinding(Key.D1, KeyModifiers.Alt));
             SetupDefaultKeybind(Hotkey.ToolSwitchRed, new Keybinding(Key.D2, KeyModifiers.Alt));
             SetupDefaultKeybind(Hotkey.ToolSwitchGreen, new Keybinding(Key.D3, KeyModifiers.Alt));
@@ -493,10 +582,14 @@ namespace linerider
             SetupDefaultKeybind(Hotkey.ToolToggleOverlay, new Keybinding(Key.V));
 
             SetupDefaultKeybind(Hotkey.TriggerMenuWindow, new Keybinding(Key.P));
-            SetupDefaultKeybind(Hotkey.SaveAsWindow, new Keybinding(Key.S, KeyModifiers.Control | KeyModifiers.Shift));
+            SetupDefaultKeybind(
+                Hotkey.SaveAsWindow,
+                new Keybinding(Key.S, KeyModifiers.Control | KeyModifiers.Shift)
+            );
             SetupDefaultKeybind(Hotkey.PreferenceDrawDebugCamera, new Keybinding(Key.Period));
             SetupDefaultKeybind(Hotkey.PreferenceDrawDebugGrid, new Keybinding(Key.Comma));
         }
+
         private static void SetupAddonDefaultKeybinds()
         {
             SetupDefaultKeybind(Hotkey.MagicAnimateAdvanceFrame, new Keybinding(Key.KeyPad0));
@@ -505,19 +598,22 @@ namespace linerider
 
             SetupDefaultKeybind(Hotkey.LineGeneratorWindow, new Keybinding(Key.G));
         }
-        private static void SetupDefaultKeybind(Hotkey hotkey, Keybinding keybinding, Keybinding secondary = null)
+
+        private static void SetupDefaultKeybind(
+            Hotkey hotkey,
+            Keybinding keybinding,
+            Keybinding secondary = null
+        )
         {
             if (keybinding.IsEmpty)
                 return;
-            DefaultKeybinds[hotkey] =
-            [
-                keybinding
-            ];
+            DefaultKeybinds[hotkey] = [keybinding];
             if (secondary != null)
             {
                 DefaultKeybinds[hotkey].Add(secondary);
             }
         }
+
         private static void LoadDefaultKeybindings()
         {
             foreach (Hotkey hk in Enum.GetValues(typeof(Hotkey)))
@@ -527,7 +623,10 @@ namespace linerider
                 LoadDefaultKeybind(hk);
             }
         }
-        public static List<Keybinding> GetHotkeyDefault(Hotkey hotkey) => !DefaultKeybinds.ContainsKey(hotkey) ? null : DefaultKeybinds[hotkey];
+
+        public static List<Keybinding> GetHotkeyDefault(Hotkey hotkey) =>
+            !DefaultKeybinds.ContainsKey(hotkey) ? null : DefaultKeybinds[hotkey];
+
         private static void LoadDefaultKeybind(Hotkey hotkey)
         {
             if (DefaultKeybinds.ContainsKey(hotkey))
@@ -546,6 +645,7 @@ namespace linerider
                 }
             }
         }
+
         private static void CreateKeybind(Hotkey hotkey, Keybinding keybinding)
         {
             Hotkey conflict = CheckConflicts(keybinding, hotkey);
@@ -553,6 +653,7 @@ namespace linerider
                 return;
             Keybinds[hotkey].Add(keybinding);
         }
+
         public static List<Keybinding> FetchBinding(Hotkey hotkey)
         {
             if (!Keybinds.ContainsKey(hotkey))
@@ -562,6 +663,7 @@ namespace linerider
                 ret.Add(new Keybinding()); // Empty
             return ret;
         }
+
         public static string HotkeyToString(Hotkey hotkey = Hotkey.None, bool addBrackets = false)
         {
             if (hotkey == Hotkey.None)
@@ -585,6 +687,7 @@ namespace linerider
                 return keysStr;
             }
         }
+
         public static Hotkey CheckConflicts(Keybinding keybinding, Hotkey hotkey)
         {
             if (!keybinding.IsEmpty)
@@ -604,9 +707,13 @@ namespace linerider
                     {
                         foreach (Keybinding keybind in keybinds.Value)
                         {
-                            if (keybind.IsBindingEqual(keybinding) &&
-                                !(inputconflicts == KeyConflicts.HardCoded &&
-                                  inputconflicts == conflicts))
+                            if (
+                                keybind.IsBindingEqual(keybinding)
+                                && !(
+                                    inputconflicts == KeyConflicts.HardCoded
+                                    && inputconflicts == conflicts
+                                )
+                            )
                                 return hk;
                         }
                     }
@@ -614,11 +721,14 @@ namespace linerider
             }
             return Hotkey.None;
         }
+
         public static void Load()
         {
             ValidateUserDataFolder();
 
-            string[] lines = File.ReadAllLines(Path.Combine(Local.UserDirPath, Constants.ConfigFileName));
+            string[] lines = File.ReadAllLines(
+                Path.Combine(Local.UserDirPath, Constants.ConfigFileName)
+            );
 
             LoadMainSettings(lines);
             LoadAddonSettings(lines);
@@ -626,11 +736,14 @@ namespace linerider
 
             PostprocessValues();
         }
+
         public static void ValidateUserDataFolder()
         {
-            Local.UserDirPath = Directory.Exists(Program.UserPortableDirectory) && !File.Exists(Path.Combine(Program.UserPortableDirectory, "TO_BE_DELETED"))
-                ? Program.UserPortableDirectory
-                : Program.UserDirectory;
+            Local.UserDirPath =
+                Directory.Exists(Program.UserPortableDirectory)
+                && !File.Exists(Path.Combine(Program.UserPortableDirectory, "TO_BE_DELETED"))
+                    ? Program.UserPortableDirectory
+                    : Program.UserDirectory;
 
             if (!Directory.Exists(Local.UserDirPath))
                 Directory.CreateDirectory(Local.UserDirPath);
@@ -648,11 +761,13 @@ namespace linerider
             TouchUserDir(Constants.SongsFolderName);
             TouchUserDir(Constants.TracksFolderName);
         }
+
         private static void TouchUserDir(string folderName)
         {
             if (!Directory.Exists(Path.Combine(Local.UserDirPath, folderName)))
                 _ = Directory.CreateDirectory(Path.Combine(Local.UserDirPath, folderName));
         }
+
         public static void PostprocessValues()
         {
             DefaultSaveFormat ??= ".json";
@@ -675,6 +790,7 @@ namespace linerider
             if (ScarfSegmentsSecondary % 2 == 0)
                 ScarfSegmentsSecondary++;
         }
+
         public static void LoadMainSettings(string[] lines)
         {
             Local.Version = GetSetting(lines, nameof(Local.Version));
@@ -697,8 +813,14 @@ namespace linerider
             LoadBool(GetSetting(lines, nameof(RecordShowFps)), ref RecordShowFps);
             LoadBool(GetSetting(lines, nameof(RecordShowTools)), ref RecordShowTools);
             LoadBool(GetSetting(lines, nameof(RecordShowHitTest)), ref RecordShowHitTest);
-            LoadBool(GetSetting(lines, nameof(RecordShowColorTriggers)), ref RecordShowColorTriggers);
-            LoadBool(GetSetting(lines, nameof(RecordResIndependentZoom)), ref RecordResIndependentZoom);
+            LoadBool(
+                GetSetting(lines, nameof(RecordShowColorTriggers)),
+                ref RecordShowColorTriggers
+            );
+            LoadBool(
+                GetSetting(lines, nameof(RecordResIndependentZoom)),
+                ref RecordResIndependentZoom
+            );
 
             LoadBool(GetSetting(lines, nameof(ScreenshotLockRatio)), ref ScreenshotLockRatio);
             LoadInt(GetSetting(lines, nameof(ScreenshotWidth)), ref ScreenshotWidth);
@@ -707,7 +829,10 @@ namespace linerider
             LoadBool(GetSetting(lines, nameof(ScreenshotShowFps)), ref ScreenshotShowFps);
             LoadBool(GetSetting(lines, nameof(ScreenshotShowTools)), ref ScreenshotShowTools);
             LoadBool(GetSetting(lines, nameof(ScreenshotShowHitTest)), ref ScreenshotShowHitTest);
-            LoadBool(GetSetting(lines, nameof(ScreenshotResIndependentZoom)), ref ScreenshotResIndependentZoom);
+            LoadBool(
+                GetSetting(lines, nameof(ScreenshotResIndependentZoom)),
+                ref ScreenshotResIndependentZoom
+            );
 
             LoadFloat(GetSetting(lines, nameof(UIScale)), ref UIScale);
             LoadBool(GetSetting(lines, nameof(UIShowZoom)), ref UIShowZoom);
@@ -715,11 +840,23 @@ namespace linerider
             LoadInt(GetSetting(lines, nameof(DefaultTimelineLength)), ref DefaultTimelineLength);
             LoadInt(GetSetting(lines, nameof(DefaultTriggerLength)), ref DefaultTriggerLength);
 
-            LoadBool(GetSetting(lines, nameof(Editor.ShowCoordinateMenu)), ref Editor.ShowCoordinateMenu);
+            LoadBool(
+                GetSetting(lines, nameof(Editor.ShowCoordinateMenu)),
+                ref Editor.ShowCoordinateMenu
+            );
             LoadBool(GetSetting(lines, nameof(Editor.LifeLockNoFakie)), ref Editor.LifeLockNoFakie);
-            LoadBool(GetSetting(lines, nameof(Editor.LifeLockNoOrange)), ref Editor.LifeLockNoOrange);
-            LoadBool(GetSetting(lines, nameof(Editor.LifeLockStrainConstraint)), ref Editor.LifeLockStrainConstraint);
-            LoadFloat(GetSetting(lines, nameof(Editor.LifeLockMaxStrain)), ref Editor.LifeLockMaxStrain);
+            LoadBool(
+                GetSetting(lines, nameof(Editor.LifeLockNoOrange)),
+                ref Editor.LifeLockNoOrange
+            );
+            LoadBool(
+                GetSetting(lines, nameof(Editor.LifeLockStrainConstraint)),
+                ref Editor.LifeLockStrainConstraint
+            );
+            LoadFloat(
+                GetSetting(lines, nameof(Editor.LifeLockMaxStrain)),
+                ref Editor.LifeLockMaxStrain
+            );
             LoadBool(GetSetting(lines, nameof(LimitLineKnobsSize)), ref LimitLineKnobsSize);
             LoadInt(GetSetting(lines, nameof(SettingsPane)), ref SettingsPane);
             LoadBool(GetSetting(lines, nameof(MuteAudio)), ref MuteAudio);
@@ -730,14 +867,23 @@ namespace linerider
             LoadBool(GetSetting(lines, nameof(Editor.ForceXySnap)), ref Editor.ForceXySnap);
             LoadFloat(GetSetting(lines, nameof(Editor.XySnapDegrees)), ref Editor.XySnapDegrees);
             LoadBool(GetSetting(lines, nameof(Editor.MomentumVectors)), ref Editor.MomentumVectors);
-            LoadBool(GetSetting(lines, nameof(Editor.RenderGravityWells)), ref Editor.RenderGravityWells);
-            LoadBool(GetSetting(lines, nameof(Editor.DrawContactPoints)), ref Editor.DrawContactPoints);
+            LoadBool(
+                GetSetting(lines, nameof(Editor.RenderGravityWells)),
+                ref Editor.RenderGravityWells
+            );
+            LoadBool(
+                GetSetting(lines, nameof(Editor.DrawContactPoints)),
+                ref Editor.DrawContactPoints
+            );
             LoadBool(GetSetting(lines, nameof(Editor.NoHitSelect)), ref Editor.NoHitSelect);
             LoadBool(GetSetting(lines, nameof(PreviewMode)), ref PreviewMode);
             LoadInt(GetSetting(lines, nameof(SlowmoSpeed)), ref SlowmoSpeed);
             LoadFloat(GetSetting(lines, nameof(DefaultPlayback)), ref DefaultPlayback);
             LoadBool(GetSetting(lines, nameof(ColorPlayback)), ref ColorPlayback);
-            LoadBool(GetSetting(lines, nameof(SyncTrackAndSongDuration)), ref SyncTrackAndSongDuration);
+            LoadBool(
+                GetSetting(lines, nameof(SyncTrackAndSongDuration)),
+                ref SyncTrackAndSongDuration
+            );
             LoadBool(GetSetting(lines, nameof(LockTrackDuration)), ref LockTrackDuration);
             LoadBool(GetSetting(lines, nameof(OnionSkinning)), ref OnionSkinning);
             LoadInt(GetSetting(lines, nameof(PastOnionSkins)), ref PastOnionSkins);
@@ -768,25 +914,42 @@ namespace linerider
             LoadColor(GetSetting(lines, nameof(Colors.EditorNightBg)), ref Colors.EditorNightBg);
             LoadColor(GetSetting(lines, nameof(Colors.ExportLine)), ref Colors.ExportLine);
             LoadColor(GetSetting(lines, nameof(Colors.EditorLine)), ref Colors.EditorLine);
-            LoadColor(GetSetting(lines, nameof(Colors.EditorNightLine)), ref Colors.EditorNightLine);
-            LoadColor(GetSetting(lines, nameof(Colors.AccelerationLine)), ref Colors.AccelerationLine);
+            LoadColor(
+                GetSetting(lines, nameof(Colors.EditorNightLine)),
+                ref Colors.EditorNightLine
+            );
+            LoadColor(
+                GetSetting(lines, nameof(Colors.AccelerationLine)),
+                ref Colors.AccelerationLine
+            );
             LoadColor(GetSetting(lines, nameof(Colors.SceneryLine)), ref Colors.SceneryLine);
             LoadColor(GetSetting(lines, nameof(Colors.StandardLine)), ref Colors.StandardLine);
             LoadInt(GetSetting(lines, nameof(Bezier.Resolution)), ref Bezier.Resolution);
             LoadInt(GetSetting(lines, nameof(Bezier.NodeSize)), ref Bezier.NodeSize);
             Enum.TryParse(GetSetting(lines, nameof(Bezier.Mode)), out Bezier.Mode);
-            LoadInt(GetSetting(lines, nameof(SmoothPencil.smoothStabilizer)), ref SmoothPencil.smoothStabilizer);
-            LoadInt(GetSetting(lines, nameof(SmoothPencil.smoothUpdateSpeed)), ref SmoothPencil.smoothUpdateSpeed);
+            LoadInt(
+                GetSetting(lines, nameof(SmoothPencil.smoothStabilizer)),
+                ref SmoothPencil.smoothStabilizer
+            );
+            LoadInt(
+                GetSetting(lines, nameof(SmoothPencil.smoothUpdateSpeed)),
+                ref SmoothPencil.smoothUpdateSpeed
+            );
             LoadBool(GetSetting(lines, nameof(InvisibleRider)), ref InvisibleRider);
         }
+
         public static void LoadAddonSettings(string[] lines)
         {
-            LoadBool(GetSetting(lines, nameof(velocityReferenceFrameAnimation)), ref velocityReferenceFrameAnimation);
+            LoadBool(
+                GetSetting(lines, nameof(velocityReferenceFrameAnimation)),
+                ref velocityReferenceFrameAnimation
+            );
             LoadBool(GetSetting(lines, nameof(forwardLinesAsScenery)), ref forwardLinesAsScenery);
             LoadBool(GetSetting(lines, nameof(recededLinesAsScenery)), ref recededLinesAsScenery);
             LoadFloat(GetSetting(lines, nameof(animationRelativeVelX)), ref animationRelativeVelX);
             LoadFloat(GetSetting(lines, nameof(animationRelativeVelY)), ref animationRelativeVelY);
         }
+
         public static void LoadKeybinds(string[] lines)
         {
             foreach (Hotkey hk in Enum.GetValues(typeof(Hotkey)))
@@ -803,7 +966,12 @@ namespace linerider
 
         public static void ForceSave()
         {
-            List<string> lines = [.. BuildMainSettingsList(), .. BuildAddonSettingsList(), .. BuildKeybindsList()];
+            List<string> lines =
+            [
+                .. BuildMainSettingsList(),
+                .. BuildAddonSettingsList(),
+                .. BuildKeybindsList(),
+            ];
 
             if (!Directory.Exists(Local.UserDirPath))
                 Directory.CreateDirectory(Local.UserDirPath);
@@ -826,9 +994,11 @@ namespace linerider
                 MakeSetting(nameof(CheckForUpdates), CheckForUpdates.ToString(Program.Culture)),
                 MakeSetting(nameof(SmoothPlayback), SmoothPlayback.ToString(Program.Culture)),
                 //MakeSetting(nameof(PlaybackZoomType), PlaybackZoomType.ToString()),
-                MakeSetting(nameof(PlaybackZoomType), ((int)PlaybackZoomType).ToString(Program.Culture)), // Temporarily force int value for backward compatibility
+                MakeSetting(
+                    nameof(PlaybackZoomType),
+                    ((int)PlaybackZoomType).ToString(Program.Culture)
+                ), // Temporarily force int value for backward compatibility
                 MakeSetting(nameof(RoundLegacyCamera), RoundLegacyCamera.ToString(Program.Culture)),
-
                 MakeSetting(nameof(RecordResolution), RecordResolution),
                 MakeSetting(nameof(RecordSmooth), RecordSmooth.ToString(Program.Culture)),
                 MakeSetting(nameof(RecordMusic), RecordMusic.ToString(Program.Culture)),
@@ -836,64 +1006,148 @@ namespace linerider
                 MakeSetting(nameof(RecordShowFps), RecordShowFps.ToString(Program.Culture)),
                 MakeSetting(nameof(RecordShowTools), RecordShowTools.ToString(Program.Culture)),
                 MakeSetting(nameof(RecordShowHitTest), RecordShowHitTest.ToString(Program.Culture)),
-                MakeSetting(nameof(RecordShowColorTriggers), RecordShowColorTriggers.ToString(Program.Culture)),
-                MakeSetting(nameof(RecordResIndependentZoom), RecordResIndependentZoom.ToString(Program.Culture)),
-
-                MakeSetting(nameof(ScreenshotLockRatio), ScreenshotLockRatio.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(RecordShowColorTriggers),
+                    RecordShowColorTriggers.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(RecordResIndependentZoom),
+                    RecordResIndependentZoom.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(ScreenshotLockRatio),
+                    ScreenshotLockRatio.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(ScreenshotWidth), ScreenshotWidth.ToString(Program.Culture)),
                 MakeSetting(nameof(ScreenshotHeight), ScreenshotHeight.ToString(Program.Culture)),
                 MakeSetting(nameof(ScreenshotShowPpf), ScreenshotShowPpf.ToString(Program.Culture)),
                 MakeSetting(nameof(ScreenshotShowFps), ScreenshotShowFps.ToString(Program.Culture)),
-                MakeSetting(nameof(ScreenshotShowTools), ScreenshotShowTools.ToString(Program.Culture)),
-                MakeSetting(nameof(ScreenshotShowHitTest), ScreenshotShowHitTest.ToString(Program.Culture)),
-                MakeSetting(nameof(ScreenshotResIndependentZoom), ScreenshotResIndependentZoom.ToString(Program.Culture)),
-
+                MakeSetting(
+                    nameof(ScreenshotShowTools),
+                    ScreenshotShowTools.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(ScreenshotShowHitTest),
+                    ScreenshotShowHitTest.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(ScreenshotResIndependentZoom),
+                    ScreenshotResIndependentZoom.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(UIScale), UIScale.ToString(Program.Culture)),
                 MakeSetting(nameof(UIShowZoom), UIShowZoom.ToString(Program.Culture)),
-                MakeSetting(nameof(UIShowSpeedButtons), UIShowSpeedButtons.ToString(Program.Culture)),
-                MakeSetting(nameof(DefaultTimelineLength), DefaultTimelineLength.ToString(Program.Culture)),
-                MakeSetting(nameof(DefaultTriggerLength), DefaultTriggerLength.ToString(Program.Culture)),
-
+                MakeSetting(
+                    nameof(UIShowSpeedButtons),
+                    UIShowSpeedButtons.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(DefaultTimelineLength),
+                    DefaultTimelineLength.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(DefaultTriggerLength),
+                    DefaultTriggerLength.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(ScrollSensitivity), ScrollSensitivity.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.ShowCoordinateMenu), Editor.ShowCoordinateMenu.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.LifeLockNoFakie), Editor.LifeLockNoFakie.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.LifeLockNoOrange), Editor.LifeLockNoOrange.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.LifeLockStrainConstraint), Editor.LifeLockStrainConstraint.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.LifeLockMaxStrain), Editor.LifeLockMaxStrain.ToString(Program.Culture)),
-                MakeSetting(nameof(LimitLineKnobsSize), LimitLineKnobsSize.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(Editor.ShowCoordinateMenu),
+                    Editor.ShowCoordinateMenu.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.LifeLockNoFakie),
+                    Editor.LifeLockNoFakie.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.LifeLockNoOrange),
+                    Editor.LifeLockNoOrange.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.LifeLockStrainConstraint),
+                    Editor.LifeLockStrainConstraint.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.LifeLockMaxStrain),
+                    Editor.LifeLockMaxStrain.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(LimitLineKnobsSize),
+                    LimitLineKnobsSize.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(SettingsPane), SettingsPane.ToString(Program.Culture)),
                 MakeSetting(nameof(MuteAudio), MuteAudio.ToString(Program.Culture)),
                 MakeSetting(nameof(Editor.HitTest), Editor.HitTest.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.SnapNewLines), Editor.SnapNewLines.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.SnapMoveLine), Editor.SnapMoveLine.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(Editor.SnapNewLines),
+                    Editor.SnapNewLines.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.SnapMoveLine),
+                    Editor.SnapMoveLine.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(Editor.SnapToGrid), Editor.SnapToGrid.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.ForceXySnap), Editor.ForceXySnap.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.XySnapDegrees), Editor.XySnapDegrees.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.MomentumVectors), Editor.MomentumVectors.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.RenderGravityWells), Editor.RenderGravityWells.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.DrawContactPoints), Editor.DrawContactPoints.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.NoHitSelect), Editor.NoHitSelect.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(Editor.ForceXySnap),
+                    Editor.ForceXySnap.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.XySnapDegrees),
+                    Editor.XySnapDegrees.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.MomentumVectors),
+                    Editor.MomentumVectors.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.RenderGravityWells),
+                    Editor.RenderGravityWells.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.DrawContactPoints),
+                    Editor.DrawContactPoints.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.NoHitSelect),
+                    Editor.NoHitSelect.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(PreviewMode), PreviewMode.ToString(Program.Culture)),
                 MakeSetting(nameof(SlowmoSpeed), SlowmoSpeed.ToString(Program.Culture)),
                 MakeSetting(nameof(DefaultPlayback), DefaultPlayback.ToString(Program.Culture)),
-                MakeSetting(nameof(SyncTrackAndSongDuration), SyncTrackAndSongDuration.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(SyncTrackAndSongDuration),
+                    SyncTrackAndSongDuration.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(ColorPlayback), ColorPlayback.ToString(Program.Culture)),
                 MakeSetting(nameof(LockTrackDuration), LockTrackDuration.ToString(Program.Culture)),
                 MakeSetting(nameof(OnionSkinning), OnionSkinning.ToString(Program.Culture)),
                 MakeSetting(nameof(PastOnionSkins), PastOnionSkins.ToString(Program.Culture)),
                 MakeSetting(nameof(FutureOnionSkins), FutureOnionSkins.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.ShowLineAngle), Editor.ShowLineAngle.ToString(Program.Culture)),
-                MakeSetting(nameof(Editor.ShowLineLength), Editor.ShowLineLength.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(Editor.ShowLineAngle),
+                    Editor.ShowLineAngle.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(Editor.ShowLineLength),
+                    Editor.ShowLineLength.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(Editor.ShowLineID), Editor.ShowLineID.ToString(Program.Culture)),
                 MakeSetting(nameof(SelectedScarf), SelectedScarf),
                 MakeSetting(nameof(SelectedBoshSkin), SelectedBoshSkin),
                 MakeSetting(nameof(ScarfAmount), ScarfAmount.ToString(Program.Culture)),
-                MakeSetting(nameof(ScarfSegmentsPrimary), ScarfSegmentsPrimary.ToString(Program.Culture)),
-                MakeSetting(nameof(ScarfSegmentsSecondary), ScarfSegmentsSecondary.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(ScarfSegmentsPrimary),
+                    ScarfSegmentsPrimary.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(ScarfSegmentsSecondary),
+                    ScarfSegmentsSecondary.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(autosaveChanges), autosaveChanges.ToString(Program.Culture)),
                 MakeSetting(nameof(autosaveMinutes), autosaveMinutes.ToString(Program.Culture)),
                 MakeSetting(nameof(AutosavePrefix), AutosavePrefix),
-                MakeSetting(nameof(startWindowMaximized), startWindowMaximized.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(startWindowMaximized),
+                    startWindowMaximized.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(DefaultSaveFormat), DefaultSaveFormat),
                 MakeSetting(nameof(DefaultAutosaveFormat), DefaultAutosaveFormat),
                 MakeSetting(nameof(DefaultQuicksaveFormat), DefaultQuicksaveFormat),
@@ -916,18 +1170,28 @@ namespace linerider
                 MakeSetting(nameof(Bezier.NodeSize), Bezier.NodeSize.ToString(Program.Culture)),
                 //MakeSetting(nameof(Bezier.Mode), Bezier.Mode.ToString()),
                 MakeSetting(nameof(Bezier.Mode), ((int)Bezier.Mode).ToString(Program.Culture)), // Temporarily force int value for backward compatibility
-                MakeSetting(nameof(SmoothPencil.smoothStabilizer), SmoothPencil.smoothStabilizer.ToString(Program.Culture)),
-                MakeSetting(nameof(SmoothPencil.smoothUpdateSpeed), SmoothPencil.smoothUpdateSpeed.ToString(Program.Culture)),
+                MakeSetting(
+                    nameof(SmoothPencil.smoothStabilizer),
+                    SmoothPencil.smoothStabilizer.ToString(Program.Culture)
+                ),
+                MakeSetting(
+                    nameof(SmoothPencil.smoothUpdateSpeed),
+                    SmoothPencil.smoothUpdateSpeed.ToString(Program.Culture)
+                ),
                 MakeSetting(nameof(InvisibleRider), InvisibleRider.ToString(Program.Culture)),
             ];
 
             return lines;
         }
+
         private static List<string> BuildAddonSettingsList()
         {
             List<string> lines =
             [
-                MakeSetting(nameof(velocityReferenceFrameAnimation), velocityReferenceFrameAnimation.ToString()),
+                MakeSetting(
+                    nameof(velocityReferenceFrameAnimation),
+                    velocityReferenceFrameAnimation.ToString()
+                ),
                 MakeSetting(nameof(forwardLinesAsScenery), forwardLinesAsScenery.ToString()),
                 MakeSetting(nameof(recededLinesAsScenery), recededLinesAsScenery.ToString()),
                 MakeSetting(nameof(animationRelativeVelX), animationRelativeVelX.ToString()),
@@ -936,6 +1200,7 @@ namespace linerider
 
             return lines;
         }
+
         private static List<string> BuildKeybindsList()
         {
             List<string> lines = [];
@@ -988,18 +1253,15 @@ namespace linerider
                 Keybinding ret = new();
                 foreach (string item in items)
                 {
-                    if (!ret.UsesModifiers &&
-                        Enum.TryParse(item, true, out KeyModifiers modifiers))
+                    if (!ret.UsesModifiers && Enum.TryParse(item, true, out KeyModifiers modifiers))
                     {
                         ret.Modifiers = modifiers;
                     }
-                    else if (!ret.UsesKeys &&
-                        Enum.TryParse(item, true, out Key key))
+                    else if (!ret.UsesKeys && Enum.TryParse(item, true, out Key key))
                     {
                         ret.Key = key;
                     }
-                    else if (!ret.UsesMouse &&
-                        Enum.TryParse(item, true, out MouseButton mouse))
+                    else if (!ret.UsesMouse && Enum.TryParse(item, true, out MouseButton mouse))
                     {
                         ret.MouseButton = mouse;
                     }
@@ -1017,19 +1279,20 @@ namespace linerider
                 setting = GetSetting(config, hotkeyname, ref line);
             }
         }
+
         private static string GetSetting(string[] config, string name)
         {
             int start = 0;
             return GetSetting(config, name, ref start);
         }
+
         private static string GetSetting(string[] config, string name, ref int start)
         {
             for (int i = start; i < config.Length; i++)
             {
                 int idx = config[i].IndexOf("=");
-                if (idx != -1 && idx + 1 < config[i].Length && config[i].Substring(0, idx) == name)//split[0] == name && split.Length > 1)
+                if (idx != -1 && idx + 1 < config[i].Length && config[i].Substring(0, idx) == name) //split[0] == name && split.Length > 1)
                 {
-
                     string split = config[i].Substring(idx + 1);
                     start = i;
                     return split;
@@ -1037,22 +1300,41 @@ namespace linerider
             }
             return null;
         }
+
         private static string MakeSetting(string name, string value) => name + "=" + value;
+
         private static void LoadInt(string setting, ref int var)
         {
-            if (int.TryParse(setting, System.Globalization.NumberStyles.Integer, Program.Culture, out int val))
+            if (
+                int.TryParse(
+                    setting,
+                    System.Globalization.NumberStyles.Integer,
+                    Program.Culture,
+                    out int val
+                )
+            )
                 var = val;
         }
+
         private static void LoadFloat(string setting, ref float var)
         {
-            if (float.TryParse(setting, System.Globalization.NumberStyles.Float, Program.Culture, out float val))
+            if (
+                float.TryParse(
+                    setting,
+                    System.Globalization.NumberStyles.Float,
+                    Program.Culture,
+                    out float val
+                )
+            )
                 var = val;
         }
+
         private static void LoadBool(string setting, ref bool var)
         {
             if (bool.TryParse(setting, out bool val))
                 var = val;
         }
+
         private static void LoadColor(string setting, ref Color var)
         {
             if (setting != null)
