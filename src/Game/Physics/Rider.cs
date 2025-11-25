@@ -100,8 +100,8 @@ namespace linerider.Game
 
         public Vector2d CalculateCenter()
         {
-            if (Crashed)
-                return Body[4].Location;
+            //if (Crashed)
+            //    return Body[4].Location;
             Vector2d anchorsaverage = new();
             for (int i = 0; i < Body.Length; i++)
             {
