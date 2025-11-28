@@ -25,7 +25,7 @@ namespace linerider.Tools
         public float GreenMultiplier { get; set; } = 1;
         public double RedMultiplier { get; set; } = 1;
 
-        public const int MaxRedMultiplier = 3;
+        public const int MaxRedMultiplier = 10;
         public const int MinRedMultiplier = 1;
         public const int MaxGreenMultiplier = 25;
         public const float MinGreenMultiplier = 0.5f;

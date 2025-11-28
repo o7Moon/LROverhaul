@@ -8,8 +8,8 @@ namespace linerider.Game
     {
         protected override Vector2d StepCamera(CameraBoundingBox box, ref Vector2d prev, int frame)
         {
-            const double push = 0.8;
-            const double pull = 0.01;
+            const double push = 0.6;
+            const double pull = 0.05;
 
             CameraEntry entry = _frames[frame];
             Vector2d ret = box.Clamp(prev + entry.CameraOffset);
