@@ -1,7 +1,7 @@
 //  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
-//  Copyright (c) 2017
+//  Copyright (c) 2017 
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,15 +33,13 @@ namespace linerider.Tools
 
         public override string Name => "Hand Tool";
         public override SKBitmap Icon => GameResources.icon_tool_pan.Bitmap;
-        public override MouseCursor Cursor =>
-            Active
-                ? zoom
-                    ? game.Cursors.List[CursorsHandler.Type.Zoom]
-                    : game.Cursors.List[CursorsHandler.Type.DragActive]
-                : game.Cursors.List[CursorsHandler.Type.DragInactive];
+        public override MouseCursor Cursor => Active
+                    ? zoom ? game.Cursors.List[CursorsHandler.Type.Zoom] : game.Cursors.List[CursorsHandler.Type.DragActive]
+                    : game.Cursors.List[CursorsHandler.Type.DragInactive];
 
-        public PanTool()
-            : base() { }
+        public PanTool() : base()
+        {
+        }
 
         public override void Cancel()
         {
@@ -52,7 +50,6 @@ namespace linerider.Tools
                 game.Track.Zoom = ZoomStart;
             }
         }
-
         public override void OnMouseRightDown(Vector2d pos)
         {
             zoom = true;
@@ -66,7 +63,6 @@ namespace linerider.Tools
             game.UpdateCursor();
             base.OnMouseRightDown(pos);
         }
-
         public override void OnMouseDown(Vector2d pos)
         {
             zoom = false;
@@ -90,20 +86,20 @@ namespace linerider.Tools
                 else
                 {
                     Vector2d newcenter =
-                        CameraStart - (pos / game.Track.Zoom - startposition / game.Track.Zoom);
+                        CameraStart -
+                        (pos / game.Track.Zoom -
+                        startposition / game.Track.Zoom);
                     game.Track.Camera.SetFrameCenter(newcenter);
                 }
                 game.Invalidate();
             }
             base.OnMouseMoved(pos);
         }
-
         public override void OnMouseRightUp(Vector2d pos)
         {
             Active = false;
             base.OnMouseRightUp(pos);
         }
-
         public override void OnMouseUp(Vector2d pos)
         {
             Active = false;
