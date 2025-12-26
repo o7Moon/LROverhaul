@@ -1,7 +1,7 @@
 ﻿//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
-//  Copyright (c) 2017
+//  Copyright (c) 2017 
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using linerider.Utils;
 using OpenTK.Mathematics;
+using System;
 
 namespace linerider.Game
 {
@@ -37,15 +37,12 @@ namespace linerider.Game
         protected Timeline _timeline;
         protected int _currentframe = 0;
         protected float _zoom = 1;
-
         public ICamera()
         {
             _frames.Add(new CameraEntry(Vector2d.Zero));
             _framecache.Add(Vector2d.Zero);
         }
-
         protected abstract Vector2d StepCamera(CameraBoundingBox box, ref Vector2d prev, int frame);
-
         public void SetTimeline(Timeline timeline)
         {
             if (timeline == null)
@@ -56,14 +53,15 @@ namespace linerider.Game
                 InvalidateFrame(1);
             }
         }
-
         public void InvalidateFrame(int frame)
         {
             if (frame <= 0)
                 throw new Exception("Cannot invalidate frame 0 for camera");
             if (frame < _frames.Count)
             {
-                _frames.RemoveRange(frame, _frames.Count - frame);
+                _frames.RemoveRange(
+                    frame,
+                    _frames.Count - frame);
                 if (_prevframe <= frame)
                     _prevframe = -1;
             }
@@ -83,7 +81,6 @@ namespace linerider.Game
                 _framecache[0] = Vector2d.Zero;
             }
         }
-
         public virtual Vector2d GetFrameCamera(int frame)
         {
             if (_zoom != _cachezoom)
@@ -124,7 +121,6 @@ namespace linerider.Game
             }
             return _center;
         }
-
         public void SetFrame(int frame)
         {
             _center = Vector2d.Zero;
@@ -134,7 +130,6 @@ namespace linerider.Game
                 _cachedcenter = Vector2d.Zero;
             }
         }
-
         public virtual void BeginFrame(float blend, float zoom)
         {
             if (_blend != blend)
@@ -144,27 +139,26 @@ namespace linerider.Game
             }
             _zoom = zoom;
         }
-
         public void SetFrameCenter(Vector2d center)
         {
             _center = center;
             _cachedcenter = Vector2d.Zero;
         }
-
-        public DoubleRect GetViewport(float zoom, int maxwidth, int maxheight)
+        public DoubleRect GetViewport(
+            float zoom,
+            int maxwidth,
+            int maxheight)
         {
             Vector2d center = GetCenter();
             Vector2d size = new(maxwidth / zoom, maxheight / zoom);
             Vector2d origin = center - size / 2;
             return new DoubleRect(origin, size);
         }
-
         public void OnResize()
         {
             SetFrameCenter(GetCenter());
             InvalidateFrame(1);
         }
-
         public DoubleRect GetClamp(float zoom, int width, int height)
         {
             DoubleRect ret = GetViewport(zoom, width, height);
@@ -181,7 +175,6 @@ namespace linerider.Game
                 return b.Bounds;
             }
         }
-
         protected void EnsureFrame(int frame)
         {
             // Ensure timeline has the frames for us.
@@ -202,19 +195,17 @@ namespace linerider.Game
                 }
             }
         }
-
         protected Vector2d CalculateOffset(int frame)
         {
-            const int threshold_frame = 152 * 40 + 20;
             CameraBoundingBox box = CameraBoundingBox.Create(Vector2d.Zero, _zoom);
-            if (_prevframe != -1 && _prevframe <= frame && (frame - _prevframe) <= 1)
+            if (_prevframe != -1 &&
+                _prevframe <= frame &&
+                (frame - _prevframe) <= 1)
             {
                 if (frame == _prevframe)
                     return _prevcamera;
-                if (frame % cacherate != 0 && frame < threshold_frame)
-                    return box.Clamp(StepCamera(box, ref _prevcamera, frame));
                 if (frame % cacherate != 0)
-                    return StepCamera(box, ref _prevcamera, frame);
+                    return box.Clamp(StepCamera(box, ref _prevcamera, frame));
             }
             int cachepos = Math.Min(frame / cacherate, _framecache.Count - 1);
             int framestart = cachepos * cacherate;
@@ -229,13 +220,8 @@ namespace linerider.Game
                 start = StepCamera(box, ref start, i);
             }
             // Debug.WriteLine("Calculating " + framestart + "-" + (frame) + " for legacy camera");
-            if (threshold_frame < frame)
-            {
-                return start;
-            }
             return box.Clamp(start);
         }
-
         protected virtual double GetPPF(int frame) => 0;
     }
 }
