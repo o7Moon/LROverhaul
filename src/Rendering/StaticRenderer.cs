@@ -1,7 +1,7 @@
 ﻿//  Author:
 //       Noah Ablaseau <nablaseau@hotmail.com>
 //
-//  Copyright (c) 2017 
+//  Copyright (c) 2017
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
+using System.Collections.Generic;
 using linerider.Drawing;
 using linerider.Utils;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
 
 namespace linerider.Rendering
 {
@@ -60,7 +60,14 @@ namespace linerider.Rendering
             return ret;
         }
 
-        public static Vector2[] DrawArc(float cx, float cy, float r, float start_angle, float arc_angle, int num_segments)
+        public static Vector2[] DrawArc(
+            float cx,
+            float cy,
+            float r,
+            float start_angle,
+            float arc_angle,
+            int num_segments
+        )
         {
             Vector2[] ret = new Vector2[num_segments];
             float theta = arc_angle / (num_segments - 1); // Theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
@@ -88,7 +95,15 @@ namespace linerider.Rendering
             return ret;
         }
 
-        public static void DrawTexture(int tex, DoubleRect rect, float alpha = 1, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
+        public static void DrawTexture(
+            int tex,
+            DoubleRect rect,
+            float alpha = 1,
+            float u1 = 0,
+            float v1 = 0,
+            float u2 = 1,
+            float v2 = 1
+        )
         {
             GenericVAO buf = new();
             Vector2d tr = new(rect.Right, rect.Top);
@@ -108,7 +123,24 @@ namespace linerider.Rendering
                 GL.BindTexture(TextureTarget.Texture2D, 0);
             }
         }
-        public static void DrawTexture(int tex, RectangleF rect, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1) => DrawTexture(tex, new DoubleRect(rect.Left, rect.Top, rect.Width, rect.Height), 1, u1, v1, u2, v2);
+
+        public static void DrawTexture(
+            int tex,
+            RectangleF rect,
+            float u1 = 0,
+            float v1 = 0,
+            float u2 = 1,
+            float v2 = 1
+        ) =>
+            DrawTexture(
+                tex,
+                new DoubleRect(rect.Left, rect.Top, rect.Width, rect.Height),
+                1,
+                u1,
+                v1,
+                u2,
+                v2
+            );
 
         public static Vector2d[] GenerateCircle(double cx, double cy, double r, int num_segments)
         {
@@ -145,6 +177,7 @@ namespace linerider.Rendering
             ret[^1] = ret[0];
             return ret;
         }
+
         public static int LoadTexture(SKBitmap bmp)
         {
             SKColorType lock_format;
@@ -167,16 +200,42 @@ namespace linerider.Rendering
 
             GL.BindTexture(TextureTarget.Texture2D, glTex);
 
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToBorder);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToBorder);
+            GL.TexParameter(
+                TextureTarget.Texture2D,
+                TextureParameterName.TextureMagFilter,
+                (int)TextureMagFilter.Linear
+            );
+            GL.TexParameter(
+                TextureTarget.Texture2D,
+                TextureParameterName.TextureMinFilter,
+                (int)TextureMinFilter.LinearMipmapLinear
+            );
+            GL.TexParameter(
+                TextureTarget.Texture2D,
+                TextureParameterName.TextureWrapS,
+                (int)All.ClampToBorder
+            );
+            GL.TexParameter(
+                TextureTarget.Texture2D,
+                TextureParameterName.TextureWrapT,
+                (int)All.ClampToBorder
+            );
             //System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, lock_format);
 
             switch (lock_format)
             {
                 case SKColorType.Bgra8888:
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp.Width, bmp.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, bmp.GetPixels());
+                    GL.TexImage2D(
+                        TextureTarget.Texture2D,
+                        0,
+                        PixelInternalFormat.Rgba,
+                        bmp.Width,
+                        bmp.Height,
+                        0,
+                        PixelFormat.Bgra,
+                        PixelType.UnsignedByte,
+                        bmp.GetPixels()
+                    );
                     break;
 
                 default:
@@ -198,26 +257,30 @@ namespace linerider.Rendering
             {
                 percent = i / (double)segments * 360.0;
                 float rad = (float)MathHelper.DegreesToRadians(percent);
-                ret[i] = new Vector2((float)(Math.Cos(rad) * radiusX), (float)(Math.Sin(rad) * radiusY));
+                ret[i] = new Vector2(
+                    (float)(Math.Cos(rad) * radiusX),
+                    (float)(Math.Sin(rad) * radiusY)
+                );
             }
             ret[segments - 1] = ret[0];
             return ret;
         }
-        public static Vector2[] GenerateThickLine(Vector2 p, Vector2 p1, float width) => GenerateThickLine(p, p1, Angle.FromLine(p, p1), width);
+
+        public static Vector2[] GenerateThickLine(Vector2 p, Vector2 p1, float width) =>
+            GenerateThickLine(p, p1, Angle.FromLine(p, p1), width);
+
         public static Vector2[] GenerateThickLine(Vector2 p, Vector2 p1, Angle angle, float width)
         {
-            FloatRect rect = new(
-                p.X - width / 2,
-                p.Y,
-                width,
-                (p1 - p).Length);
+            FloatRect rect = new(p.X - width / 2, p.Y, width, (p1 - p).Length);
             angle.Degrees -= 90;
             // Returns tl tr br bl of the rotated rectangle
             Vector2[] rot = Utility.RotateRect(rect, p, angle);
             // We return tr br bl tl
             return [rot[1], rot[2], rot[3], rot[0]];
         }
-        public static void RenderRect(FloatRect rect, Color color) => RenderRect(new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), color);
+
+        public static void RenderRect(FloatRect rect, Color color) =>
+            RenderRect(new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), color);
 
         public static void RenderRect(RectangleF rect, Color color)
         {

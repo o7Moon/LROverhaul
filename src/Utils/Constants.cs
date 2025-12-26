@@ -1,7 +1,7 @@
-﻿using OpenTK.Mathematics;
-using OpenTK.Windowing.Desktop;
-using System;
+﻿using System;
 using System.IO;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Desktop;
 
 namespace linerider.Utils
 {
@@ -15,10 +15,7 @@ namespace linerider.Utils
         public static readonly Color BgExportColor = Color.White;
         public static readonly Color BgEditorColor = Color.FromArgb(0xF9, 0xF9, 0xF9);
         public static readonly Color BgEditorNightColor = Color.FromArgb(0x33, 0x33, 0x33);
-        public static readonly int[] MotionArray =
-        [
-            1, 2, 5, 10, 20, 30, 40, 80, 160, 320, 640
-        ];
+        public static readonly int[] MotionArray = [1, 2, 5, 10, 20, 30, 40, 80, 160, 320, 640];
         public static readonly Color RedLineColor = Color.FromArgb(0xE5, 0x39, 0x35);
         public static readonly Color BlueLineColor = Color.FromArgb(0x21, 0x96, 0xF3);
         public static readonly Color SceneryLineColor = Color.FromArgb(0x43, 0xA0, 0x47);
@@ -73,19 +70,25 @@ namespace linerider.Utils
                 return new Size(monitor.HorizontalResolution, monitor.VerticalResolution);
             }
         }
-        public static readonly double ScreenScale = Math.Max(1,
-            Math.Round(((double)ScreenSize.Width / 1600 < (double)ScreenSize.Height / 1080)
-                ? ((double)ScreenSize.Width / 1600)
-                : ((double)ScreenSize.Height / 1080),
-            2)
+        public static readonly double ScreenScale = Math.Max(
+            1,
+            Math.Round(
+                ((double)ScreenSize.Width / 1600 < (double)ScreenSize.Height / 1080)
+                    ? ((double)ScreenSize.Width / 1600)
+                    : ((double)ScreenSize.Height / 1080),
+                2
+            )
         );
         public static readonly Size WindowSize = new(
             Math.Max(1280, (int)Math.Round(ScreenSize.Width / 1.5)),
             Math.Max(720, (int)Math.Round(ScreenSize.Height / 1.5))
         );
 
-        public static readonly string GithubPageHeader = "https://github.com/LunaKampling/LROverhaul";
-        public static readonly string GithubRawHeader = "https://raw.githubusercontent.com/LunaKampling/LROverhaul";
-        public static readonly string FfmpegHelperHeader = "https://github.com/jealouscloud/lra-ffmpeg/releases/download/ffmpeg4.0-x64/ffmpeg";
+        public static readonly string GithubPageHeader =
+            "https://github.com/LunaKampling/LROverhaul";
+        public static readonly string GithubRawHeader =
+            "https://raw.githubusercontent.com/LunaKampling/LROverhaul";
+        public static readonly string FfmpegHelperHeader =
+            "https://github.com/jealouscloud/lra-ffmpeg/releases/download/ffmpeg4.0-x64/ffmpeg";
     }
 }
