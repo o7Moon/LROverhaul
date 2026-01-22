@@ -1,6 +1,7 @@
+using System;
 using linerider.Game;
 using linerider.Rendering;
-using System;
+
 //using System.Windows.Forms;
 
 namespace linerider.Addons
@@ -28,9 +29,93 @@ namespace linerider.Addons
         public static double BodyFLY;
         public static double BodyFRY;
 
-        public static double[] CoordsX = [SledTLX, SledBLX, SledBRX, SledTRX, BodyBuX, BodyShX, BodyHLX, BodyHRX, BodyFLX, BodyFRX];
-        public static double[] CoordsY = [SledTLY, SledBLY, SledBRY, SledTRY, BodyBuY, BodyShY, BodyHLY, BodyHRY, BodyFLY, BodyFRY];
-        public static string[] ConPName = ["SledTL", "SledBL", "SledBR", "SledTR", "BodyBu", "BodySh", "BodyHL", "BodyHR", "BodyFL", "BodyFR"];
+        public static double momentumSledTLX;
+        public static double momentumSledBLX;
+        public static double momentumSledBRX;
+        public static double momentumSledTRX;
+        public static double momentumBodyBuX;
+        public static double momentumBodyShX;
+        public static double momentumBodyHLX;
+        public static double momentumBodyHRX;
+        public static double momentumBodyFLX;
+        public static double momentumBodyFRX;
+        public static double momentumSledTLY;
+        public static double momentumSledBLY;
+        public static double momentumSledBRY;
+        public static double momentumSledTRY;
+        public static double momentumBodyBuY;
+        public static double momentumBodyShY;
+        public static double momentumBodyHLY;
+        public static double momentumBodyHRY;
+        public static double momentumBodyFLY;
+        public static double momentumBodyFRY;
+
+        public static double[] CoordsX =
+        [
+            SledTLX,
+            SledBLX,
+            SledBRX,
+            SledTRX,
+            BodyBuX,
+            BodyShX,
+            BodyHLX,
+            BodyHRX,
+            BodyFLX,
+            BodyFRX,
+        ];
+        public static double[] CoordsY =
+        [
+            SledTLY,
+            SledBLY,
+            SledBRY,
+            SledTRY,
+            BodyBuY,
+            BodyShY,
+            BodyHLY,
+            BodyHRY,
+            BodyFLY,
+            BodyFRY,
+        ];
+        public static double[] MomentumX =
+        [
+            momentumSledTLX,
+            momentumSledBLX,
+            momentumSledBRX,
+            momentumSledTRX,
+            momentumBodyBuX,
+            momentumBodyShX,
+            momentumBodyHLX,
+            momentumBodyHRX,
+            momentumBodyFLX,
+            momentumBodyFRX,
+        ];
+        public static double[] MomentumY =
+        [
+            momentumSledTLY,
+            momentumSledBLY,
+            momentumSledBRY,
+            momentumSledTRY,
+            momentumBodyBuY,
+            momentumBodyShY,
+            momentumBodyHLY,
+            momentumBodyHRY,
+            momentumBodyFLY,
+            momentumBodyFRY,
+        ];
+
+        public static string[] ConPName =
+        [
+            "SledTL",
+            "SledBL",
+            "SledBR",
+            "SledTR",
+            "BodyBu",
+            "BodySh",
+            "BodyHL",
+            "BodyHR",
+            "BodyFL",
+            "BodyFR",
+        ];
         public static string[] CoordsData = ["", "", "", "", "", "", "", "", "", ""];
 
         public static int frame;
@@ -49,10 +134,24 @@ namespace linerider.Addons
             {
                 CoordsX[i] = rider.Body[i].Location.X;
                 CoordsY[i] = rider.Body[i].Location.Y;
+                MomentumX[i] = rider.Body[i].Momentum.X;
+                MomentumY[i] = rider.Body[i].Momentum.Y;
 
-                CoordsData[i] = ConPName[i] + ": " + CoordsX[i].ToString("G17") + "X " + CoordsY[i].ToString("G17") + "Y";
+                CoordsData[i] =
+                    ConPName[i]
+                    + ": "
+                    + CoordsX[i].ToString("G17")
+                    + "X "
+                    + CoordsY[i].ToString("G17")
+                    + "Y"
+                    + "\nvectors "
+                    + MomentumX[i].ToString("G17")
+                    + "X "
+                    + MomentumY[i].ToString("G17")
+                    + "Y";
             }
         }
+
         public static void SaveToClipboard()
         {
             MainWindow game = GameRenderer.Game;
