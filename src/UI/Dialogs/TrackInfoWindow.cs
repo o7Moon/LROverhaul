@@ -21,6 +21,20 @@ namespace linerider.UI
         }
         private void ListSongs(ControlBase parent)
         {
+            Panel Search = new(parent)
+            {
+                Dock = Dock.Top,
+                AutoSizeToContents = true,
+            };
+            TextBox SearchText = new(Search)
+            {
+                Dock = Dock.Fill,
+            };
+            Button SearchButton = new(Search)
+            {
+                Text = "Search",
+                Dock = Dock.Right,
+            };
             ListBox Songs = new(parent)
             {
                 AllowMultiSelect = false
@@ -65,6 +79,25 @@ namespace linerider.UI
                     if (name == _editor.Song.Location)
                         Songs.SelectRow(node, true);
                 }
+
+                var SearchAction = () =>
+                {
+                    foreach (var song in Songs.Children)
+                    {
+                        ListBoxRow row = song as ListBoxRow;
+                        if (row == null) continue;
+                        row.IsHidden = !row.Text.StartsWith(SearchText.Text, StringComparison.OrdinalIgnoreCase);
+                    }
+                };
+
+                SearchButton.Clicked += (o, e) => {
+                    SearchAction();
+                };
+
+                SearchText.SubmitPressed += (o, e) =>
+                {
+                    SearchAction();
+                };
             }
         }
         private void PopulateSong(ControlBase parent)

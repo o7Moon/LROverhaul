@@ -25,6 +25,20 @@ namespace linerider.UI
         public LoadWindow(GameCanvas parent, Editor editor) : base(parent, editor)
         {
             Title = title;
+            Panel Search = new(this)
+            {
+                Dock = Dock.Top,
+                AutoSizeToContents = true,
+            };
+            TextBox SearchText = new(Search)
+            {
+                Dock = Dock.Fill,
+            };
+            Button SearchButton = new(Search)
+            {
+                Text = "Search",
+                Dock = Dock.Right,
+            };
             _tree = new TreeControl(this)
             {
                 Dock = Dock.Fill
@@ -67,6 +81,26 @@ namespace linerider.UI
             // AutoSizeToContents = true;
             MakeModal(true);
             Setup();
+
+            var SearchAction = () =>
+            {
+                foreach (var child in _tree.Children)
+                {
+                    TreeNode node = (TreeNode)child;
+                    if (node == null) continue;
+                    node.IsHidden = !node.Text.StartsWith(SearchText.Text, StringComparison.OrdinalIgnoreCase);
+                }
+            };
+
+            SearchButton.Clicked += (o, e) =>
+            {
+                SearchAction();
+            };
+
+            SearchText.SubmitPressed += (sender, arguments) =>
+            {
+                SearchAction();
+            };
         }
         private void Setup()
         {
