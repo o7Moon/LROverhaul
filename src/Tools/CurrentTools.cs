@@ -10,6 +10,8 @@
         public static SelectTool SelectTool { get; private set; }
         public static SelectSubtool SelectSubtool { get; private set; }
         public static PanTool PanTool { get; private set; }
+        
+        public static PullTool PullTool { get; private set; }
         public static Tool _current;
         public static Tool CurrentTool => _quickpan ? PanTool : _current;
         private static bool _quickpan = false;
@@ -42,6 +44,7 @@
             PanTool = new PanTool();
             SelectSubtool = new SelectSubtool();
             SelectTool = new SelectTool();
+            PullTool = new PullTool();
             _current = PencilTool;
         }
         public static void SetTool(Tool tool)
@@ -91,6 +94,9 @@
                 if (CurrentTool == SelectSubtool)
                     SelectSubtool.Swatch.Selected = LineType.All;
                 _current = SelectSubtool;
+            } else if (tool == PullTool)
+            {
+                _current = PullTool;
             }
         }
     }

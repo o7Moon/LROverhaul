@@ -78,7 +78,7 @@ namespace linerider.UI
             PopulatePlayback(page);
             page = AddPage(cat, "Camera");
             PopulateCamera(page);
-            page = AddPage(cat, "Tools");
+            page = AddPage(cat, "Tools", true);
             PopulateTools(page);
 
             cat = _prefcontainer.Add("Interface");
@@ -111,13 +111,22 @@ namespace linerider.UI
                 page.Show();
             }
         }
-        private ControlBase AddPage(CollapsibleCategory category, string name)
+        private ControlBase AddPage(CollapsibleCategory category, string name, bool scroll = false)
         {
-            Panel panel = new(this)
+            ControlBase panel;
+            if (scroll)
             {
-                Dock = Dock.Fill,
-                Padding = Padding.Five
-            };
+                panel = new ScrollControl(this)
+                {
+                    Dock = Dock.Fill,
+                    Padding = Padding.Five
+                };
+            }
+            else
+            {
+                panel = new(this) { Dock = Dock.Fill, Padding = Padding.Five };
+            }
+
             panel.Hide();
             panel.UserData = _tabscount;
 
@@ -748,6 +757,37 @@ namespace linerider.UI
                 Settings.Save();
             });
             forcesnap.Tooltip = "Forces all lines drawn to\nsnap to multiples of a chosen angle";
+            
+            Panel PullToolGroup = GwenHelper.CreateHeaderPanel(parent, "Pull Tool");
+            SpinnerG17 LineLength = new SpinnerG17(PullToolGroup)
+            {
+                Min = 0,
+                IncrementSize = 0.0001,
+                Value = Settings.Editor.PullToolLineLength
+            };
+            LineLength.Width *= 4;
+            LineLength.Dock = Dock.Fill;
+            LineLength.ValueChanged += (o, e) =>
+            {
+                Settings.Editor.PullToolLineLength = ((SpinnerG17)o).Value;
+            };
+
+            _ = GwenHelper.CreateLabeledControl(PullToolGroup, "Line Length", LineLength);
+            
+            SpinnerG17 MultiplierScale = new SpinnerG17(PullToolGroup)
+            {
+                Min = 0,
+                IncrementSize = 0.0001,
+                Value = Settings.Editor.PullToolMultiplierScale
+            };
+            MultiplierScale.Width *= 4;
+            MultiplierScale.Dock = Dock.Fill;
+            MultiplierScale.ValueChanged += (o, e) =>
+            {
+                Settings.Editor.PullToolMultiplierScale = ((SpinnerG17)o).Value;
+            };
+
+            _ = GwenHelper.CreateLabeledControl(PullToolGroup, "Multiplier Scale", MultiplierScale);
         }
         private void PopulateInterfaceGeneral(ControlBase parent)
         {

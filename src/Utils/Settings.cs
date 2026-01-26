@@ -87,6 +87,9 @@ namespace linerider
             public static bool ShowLineAngle;
             public static bool ShowLineID;
             public static bool NoHitSelect;
+            public static double PullToolLineLength;
+            public static double PullToolMultiplierScale;
+            //public static bool PullToolRadialMode;
         }
 
         public static class Colors
@@ -305,6 +308,8 @@ namespace linerider
             Editor.ShowLineAngle = true;
             Editor.ShowLineID = false;
             Editor.NoHitSelect = false;
+            Editor.PullToolLineLength = 0.001;
+            Editor.PullToolMultiplierScale = 5;
             Colors.ExportBg = Constants.BgExportColor;
             Colors.EditorBg = Constants.BgEditorColor;
             Colors.EditorNightBg = Constants.BgEditorNightColor;
@@ -876,6 +881,8 @@ namespace linerider
                 ref Editor.DrawContactPoints
             );
             LoadBool(GetSetting(lines, nameof(Editor.NoHitSelect)), ref Editor.NoHitSelect);
+            LoadDouble(GetSetting(lines, nameof(Editor.PullToolLineLength)), ref Editor.PullToolLineLength);
+            LoadDouble(GetSetting(lines, nameof(Editor.PullToolMultiplierScale)), ref Editor.PullToolMultiplierScale);
             LoadBool(GetSetting(lines, nameof(PreviewMode)), ref PreviewMode);
             LoadInt(GetSetting(lines, nameof(SlowmoSpeed)), ref SlowmoSpeed);
             LoadFloat(GetSetting(lines, nameof(DefaultPlayback)), ref DefaultPlayback);
@@ -1109,6 +1116,8 @@ namespace linerider
                     nameof(Editor.NoHitSelect),
                     Editor.NoHitSelect.ToString(Program.Culture)
                 ),
+                MakeSetting(nameof(Editor.PullToolLineLength), Editor.PullToolLineLength.ToString(Program.Culture)),
+                MakeSetting(nameof(Editor.PullToolMultiplierScale), Editor.PullToolMultiplierScale.ToString(Program.Culture)),
                 MakeSetting(nameof(PreviewMode), PreviewMode.ToString(Program.Culture)),
                 MakeSetting(nameof(SlowmoSpeed), SlowmoSpeed.ToString(Program.Culture)),
                 MakeSetting(nameof(DefaultPlayback), DefaultPlayback.ToString(Program.Culture)),
@@ -1311,6 +1320,19 @@ namespace linerider
                     System.Globalization.NumberStyles.Integer,
                     Program.Culture,
                     out int val
+                )
+            )
+                var = val;
+        }
+
+        private static void LoadDouble(string setting, ref double var)
+        {
+            if (
+                double.TryParse(
+                    setting,
+                    System.Globalization.NumberStyles.Float,
+                    Program.Culture,
+                    out double val
                 )
             )
                 var = val;

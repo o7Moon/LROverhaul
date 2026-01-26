@@ -44,7 +44,7 @@ namespace linerider.UI.Widgets
                 Hotkey = Hotkey.EditorPencilTool,
                 HotkeyCondition = hotkeyCondition,
             };
-            _ = new MultiToolButton(this, [CurrentTools.LineTool, CurrentTools.BezierTool])
+            _ = new MultiToolButton(this, [CurrentTools.LineTool, CurrentTools.BezierTool, CurrentTools.PullTool])
             {
                 Hotkey = Hotkey.EditorLineTool,
                 HotkeyCondition = hotkeyCondition,
