@@ -429,6 +429,7 @@ namespace linerider.Tools
             {
                 _copybuffer.Add(selected.line.Clone());
             }
+            _copybuffer.Sort((line1, line2) => line1.ID.CompareTo(line2.ID));
             _copyorigin = GetCopyOrigin();
         }
         public void Paste() => PasteFromBuffer(_copybuffer);
