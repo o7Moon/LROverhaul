@@ -150,19 +150,18 @@ namespace linerider.Rendering
         }
         public static int LoadTexture(SKBitmap bmp)
         {
-            SKColorType lock_format;
+            PixelFormat glformat;
             switch (bmp.ColorType)
             {
                 case SKColorType.Bgra8888:
-                    lock_format = SKColorType.Bgra8888;
+                    glformat = PixelFormat.Bgra;
+                    break;
+                case SKColorType.Rgba8888:
+                    glformat = PixelFormat.Rgba;
                     break;
 
-                /*case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
-                    lock_format = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
-                    break;*/
-
                 default:
-                    throw new Exception("Failed to load texture");
+                    throw new Exception($"Failed to load texture with pixel format {bmp.ColorType}");
             }
 
             // Create the opengl texture
@@ -174,20 +173,9 @@ namespace linerider.Rendering
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToBorder);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToBorder);
-            //System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, lock_format);
 
-            switch (lock_format)
-            {
-                case SKColorType.Bgra8888:
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp.Width, bmp.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, bmp.GetPixels());
-                    break;
-
-                default:
-                    // Invalid
-                    break;
-            }
-
-            //bmp.UnlockBits(data);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp.Width, bmp.Height, 0, glformat, PixelType.UnsignedByte, bmp.GetPixels());
+                    
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             return glTex;
