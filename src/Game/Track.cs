@@ -75,6 +75,17 @@ namespace linerider
         public bool ZeroStart = false;
         public bool frictionless = false;
         public bool Remount = true;
+        public bool compatEnabled = false;
+        public bool CompatEnabled
+        {
+            get => compatEnabled;
+            set
+            {
+                compatEnabled = value;
+                GenerateBones();
+            }
+        }
+
         public int BGColorR = Settings.Colors.ExportBg.R;
         public int BGColorG = Settings.Colors.ExportBg.G;
         public int BGColorB = Settings.Colors.ExportBg.B;
@@ -113,6 +124,16 @@ namespace linerider
         }
         private void GenerateBones()
         {
+            if (CompatEnabled)
+            {
+                Bones = RiderConstants.Bones;
+                return;
+            }
+            
+            // the code below desyncs from both flash and .com,
+            // which both calculate the rest lengths before
+            // offsetting the points.                     ~moss
+            
             // If the start offset is different the floating point math could
             // result in a slightly different restlength and cause inconsistency.
             ImmutablePointCollection joints = GetStart().Body;
@@ -230,7 +251,7 @@ namespace linerider
         /// Removes the line from the physics
         /// </summary>
         public void RemoveLineFromGrid(StandardLine line) => Grid.RemoveLine(line);
-        public Rider GetStart() => Rider.Create(StartOffset, new Vector2d(ZeroStart ? 0 : RiderConstants.StartingMomentum, 0), Remount, frictionless);
+        public Rider GetStart() => Rider.Create(StartOffset, new Vector2d(ZeroStart ? 0 : RiderConstants.StartingMomentum, 0), Remount, frictionless, this);
         public void SetVersion(int version) => Grid.GridVersion = version;
     }
 }

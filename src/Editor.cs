@@ -126,6 +126,17 @@ namespace linerider
             }
         }
 
+        public bool CompatEnabled
+        {
+            get => _track.CompatEnabled;
+            set
+            {
+                _track.CompatEnabled = value;
+                Stop();
+                Reset();
+            }
+        }
+
         public double GravityWellSize
         {
             get => _track.GravityWellSize;

@@ -18,6 +18,7 @@ namespace linerider.IO
     "6.1","SONGINFO",
     "IGNORABLE_TRIGGER",
     "ZEROSTART",
+    "COMPATPATCH"
         ];
 
         //private const int REDMULTIPLIER_INDEX = 0;
@@ -223,6 +224,10 @@ namespace linerider.IO
 
                         case TrackFeatures.frictionless:
                             ret.frictionless = true;
+                            break;
+                        
+                        case TrackFeatures.com_compat:
+                            ret.CompatEnabled = true;
                             break;
 
                         default:

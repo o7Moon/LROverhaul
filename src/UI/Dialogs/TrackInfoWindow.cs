@@ -187,6 +187,12 @@ namespace linerider.UI
                 _editor.Frictionless = frictionless.IsChecked;
             };
 
+            CheckProperty compat = GwenHelper.AddPropertyCheckbox(table, "Compatibility Patch", _editor.CompatEnabled);
+            compat.ValueChanged += (o, e) =>
+            {
+                _editor.CompatEnabled = compat.IsChecked;
+            };
+
             NumberProperty ygravity = new(null)
             {
                 Min = float.MinValue + 1,

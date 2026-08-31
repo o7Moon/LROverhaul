@@ -39,7 +39,10 @@ namespace linerider.Game
         public bool UseRemount;
         public readonly int remountState; //0 = Alive, 1 = dead cooldown, 2 = dead can remount, 3 = remounting
         public readonly int remountTimer;
-        private Rider(SimulationPoint[] body, SimulationPoint[] scarf, RectLRTB physbounds, bool dead, bool sledbroken, bool useRemount, int rState = 0, int rTimer = 0)
+        private Track track;
+        bool CompatEnabled { get => track != null && track.CompatEnabled; }
+
+        private Rider(SimulationPoint[] body, SimulationPoint[] scarf, RectLRTB physbounds, bool dead, bool sledbroken, bool useRemount, int rState = 0, int rTimer = 0, Track track = null)
         {
             Body = new ImmutablePointCollection(body);
             Scarf = new ImmutablePointCollection(scarf);
@@ -49,8 +52,9 @@ namespace linerider.Game
             UseRemount = useRemount;
             remountState = rState;
             remountTimer = rTimer;
+            this.track = track;
         }
-        public static Rider Create(Vector2d start, Vector2d momentum, bool useRemount, bool frictionless)
+        public static Rider Create(Vector2d start, Vector2d momentum, bool useRemount, bool frictionless, Track track = null)
         {
             SimulationPoint[] joints = new SimulationPoint[RiderConstants.DefaultRider.Length];
             SimulationPoint[] scarf = new SimulationPoint[RiderConstants.DefaultScarf.Length + 1];
@@ -95,7 +99,7 @@ namespace linerider.Game
                 Vector2d pos = scarf[0].Location + RiderConstants.DefaultScarf[i];
                 scarf[i + 1] = new SimulationPoint(pos, pos, Vector2d.Zero, 0.9);
             }
-            return new Rider(joints, scarf, pbounds, false, false, useRemount);
+            return new Rider(joints, scarf, pbounds, false, false, useRemount, track: track);
         }
 
         public Vector2d CalculateCenter()
@@ -223,7 +227,7 @@ namespace linerider.Game
                 }
             }
         }
-        public static unsafe bool TestSurvivable(Bone[] bones, SimulationPoint[] body, double enduranceMultiplier = 1.0) // Tests if a given Bosh state can survive with a given endurance multiplier
+        public static unsafe bool TestSurvivable(Bone[] bones, SimulationPoint[] body, double enduranceMultiplier = 1.0, bool compat = false) // Tests if a given Bosh state can survive with a given endurance multiplier
         {
             int bonelen = bones.Length;
             for (int i = 0; i < bonelen; i++)
@@ -250,10 +254,21 @@ namespace linerider.Game
                 }
             }
 
+            if (!compat) return true; // fakie used to not prevent remount checks
+            
+            Vector2d nose = body[RiderConstants.SledTR].Location - body[RiderConstants.SledTL].Location;
+            Vector2d tail = body[RiderConstants.SledBL].Location - body[RiderConstants.SledTL].Location;
+            Vector2d head = body[RiderConstants.BodyShoulder].Location - body[RiderConstants.BodyButt].Location;
+            if (nose.X * tail.Y - nose.Y * tail.X < 0 || // Tail fakie
+                nose.X * head.Y - nose.Y * head.X > 0)   // Head fakie
+            {
+                return false;
+            }
+
             return true; // If none of Bosh's bones are unsurvivable, the state survives so return true
         }
 
-        public static unsafe void ProcessRemount(Bone[] bones, SimulationPoint[] body, ref bool dead, ref bool sledbroken, ref int rState, ref int rTimer)
+        public static unsafe void ProcessRemount(Bone[] bones, SimulationPoint[] body, ref bool dead, ref bool sledbroken, ref int rState, ref int rTimer, bool compat = false)
         {
             if (sledbroken == true)
             {
@@ -278,13 +293,13 @@ namespace linerider.Game
                         rState = 2;
                         rTimer = 0;
                     }
-                    else
+                    else if (!compat)
                     {
                         rTimer += 1;
                     }
                     break;
                 case 2: // Dismounted (dead & can remount)
-                    if (TestSurvivable(bones, body, 2.0))
+                    if (TestSurvivable(bones, body, 2.0, compat))
                     {
                         if (rTimer >= 3) // If Bosh has been within 2x endurance range for 3 consecutive frames, go to remounting phase
                         {
@@ -292,7 +307,7 @@ namespace linerider.Game
                             dead = false;
                             rTimer = 0;
                         }
-                        else
+                        else if (!compat)
                         {
                             rTimer += 1;
                         }
@@ -303,20 +318,21 @@ namespace linerider.Game
                     }
                     break;
                 case 3: // Remounting
-                    if (!TestSurvivable(bones, body, 2.0) || dead) // If Bosh can't survive with 2x endurance range, go back to dismounted phase (TODO check if this is redundant)
+                    
+                    if (!compat && (!TestSurvivable(bones, body, 2.0, compat) || dead)) // If Bosh can't survive with 2x endurance range, go back to dismounted phase (TODO check if this is redundant)
                     {
                         rState = 2;
                         rTimer = 0;
                         dead = true;
                     }
-                    if (TestSurvivable(bones, body, 1.0))
+                    if (TestSurvivable(bones, body, 1.0, compat))
                     {
                         if (rTimer >= 3) // If Bosh has been within the standard endurance range for 3 consecutive frames, go to normal mounted phase
                         {
                             rState = 0;
                             rTimer = 0;
                         }
-                        else
+                        else if (!compat)
                         {
                             rTimer += 1;
                         }
@@ -329,7 +345,7 @@ namespace linerider.Game
             }
         }
 
-        public static unsafe void ProcessBones(Bone[] bones, SimulationPoint[] body, ref bool dead, ref int rState, List<int> breaks = null, int subiteration = RiderConstants.Subiterations)
+        public static unsafe void ProcessBones(Bone[] bones, SimulationPoint[] body, ref bool dead, ref int rState, ref int rTimer, List<int> breaks = null, int subiteration = RiderConstants.Subiterations, bool compat = false)
         {
             int bonelen = bones.Length;
 
@@ -349,6 +365,14 @@ namespace linerider.Game
                 Vector2d d = body[j1].Location - body[j2].Location;
                 double len = d.Length;
 
+                if (compat)
+                {
+                    // .com remounting updates rstate within the bone processing loop
+                    // .com remounting also only affects the breakable bones
+                    strengthMult = rState == 3 && bone.Breakable ? RiderConstants.CompatRemountStrengthMultiplier : 1.0;
+                    enduranceMult = rState == 3 && bone.Breakable ? RiderConstants.RemountEnduranceMultiplier : 1.0;
+                }
+
                 if (!bone.OnlyRepel || len < bone.RestLength)
                 {
                     double scalar = (len - bone.RestLength) / len * 0.5;
@@ -360,6 +384,17 @@ namespace linerider.Game
                     }
                     if (bone.Breakable && (dead || scalar > bone.RestLength * RiderConstants.EnduranceFactor * enduranceMult))
                     {
+                        if (rState == 3)
+                        {
+                            rState = 2;
+                            rTimer = 0;
+                        }
+
+                        if (rState == 0)
+                        {
+                            rState = 1;
+                        }
+
                         dead = true;
                         breaks?.Add(i);
                     }
@@ -421,17 +456,17 @@ namespace linerider.Game
             bool dead = Crashed;
             bool sledbroken = SledBroken;
             int rState = remountState;
-            int rTimer = remountTimer;
+            int rTimer = remountTimer + (rState == 0 || !CompatEnabled ? 0 : 1);
             RectLRTB phys = new(ref body[0]);
             bool skipRestOfFrame = false;
             using (grid.Sync.AcquireRead())
             {
                 for (int i = 0; i < maxiteration; i++)
                 {
-                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState);
+                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState, ref rTimer, compat: CompatEnabled);
                     else
                     {
-                        ProcessBones(bones, body, ref dead, ref rState, subiteration: maxsubiteration);
+                        ProcessBones(bones, body, ref dead, ref rState, ref rTimer, subiteration: maxsubiteration, compat: CompatEnabled);
                         if (maxsubiteration < RiderConstants.Subiterations)
                         {
                             skipRestOfFrame = true;
@@ -446,17 +481,22 @@ namespace linerider.Game
                 Vector2d nose = body[RiderConstants.SledTR].Location - body[RiderConstants.SledTL].Location;
                 Vector2d tail = body[RiderConstants.SledBL].Location - body[RiderConstants.SledTL].Location;
                 Vector2d head = body[RiderConstants.BodyShoulder].Location - body[RiderConstants.BodyButt].Location;
-                if (!dead && (nose.X * tail.Y - nose.Y * tail.X < 0 || // Tail fakie
-                             nose.X * head.Y - nose.Y * head.X > 0))   // Head fakie
+                
+                bool tailfakie = nose.X * tail.Y - nose.Y * tail.X < 0;
+                bool headfakie = nose.X * head.Y - nose.Y * head.X > 0;
+                if ((!dead || CompatEnabled) && (tailfakie || headfakie))
                 {
                     dead = true;
-                    sledbroken = true;
+                    if (!CompatEnabled || tailfakie)
+                    {
+                        sledbroken = true;
+                    }
                 }
             }
 
             if (UseRemount && !skipRestOfFrame)
             {
-                ProcessRemount(bones, body, ref dead, ref sledbroken, ref rState, ref rTimer);
+                ProcessRemount(bones, body, ref dead, ref sledbroken, ref rState, ref rTimer, compat: CompatEnabled);
             }
 
             SimulationPoint[] scarf;
@@ -513,7 +553,7 @@ namespace linerider.Game
             {
                 scarf = new SimulationPoint[Scarf.Length];
             }
-            return new Rider(body, scarf, phys, dead, sledbroken, UseRemount, rState, rTimer);
+            return new Rider(body, scarf, phys, dead, sledbroken, UseRemount, rState, rTimer, track);
         }
 
         public List<int> Diagnose(
@@ -541,6 +581,7 @@ namespace linerider.Game
             _ = Body.Length;
             bool dead = Crashed;
             int rState = remountState;
+            int rTimer = remountTimer + (rState == 0 ? 0 : 1);
             RectLRTB phys = new(ref body[0]);
             bool skipRestOfFrame = false;
             List<int> breaks = [];
@@ -548,10 +589,10 @@ namespace linerider.Game
             {
                 for (int i = 0; i < maxiteration; i++)
                 {
-                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState, breaks);
+                    if (i < maxiteration - 1) ProcessBones(bones, body, ref dead, ref rState, ref rTimer, breaks, compat: CompatEnabled);
                     else
                     {
-                        ProcessBones(bones, body, ref dead, ref rState, breaks, maxsubiteration);
+                        ProcessBones(bones, body, ref dead, ref rState, ref rTimer, breaks, maxsubiteration, compat: CompatEnabled);
                         if (maxsubiteration < RiderConstants.Subiterations)
                         {
                             skipRestOfFrame = true;

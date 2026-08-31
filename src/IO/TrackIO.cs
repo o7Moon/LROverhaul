@@ -104,6 +104,11 @@ namespace linerider.IO
                 ret[TrackFeatures.remount] = true;
             }
 
+            if (trk.CompatEnabled)
+            {
+                ret[TrackFeatures.com_compat] = true;
+            }
+
             return ret;
         }
         /// Checks a relative filename for validity
