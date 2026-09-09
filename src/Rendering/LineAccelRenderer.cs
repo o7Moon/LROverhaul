@@ -100,23 +100,12 @@ namespace linerider.Rendering
         }
         public void Draw(DrawOptions draw)
         {
-            //_accelbuffer.Bind();
             GL.BindVertexArray(_vao);
             Shaders.GenericShader.Use();
-            //GL.EnableClientState(ArrayCap.VertexArray);
-            //GL.EnableClientState(ArrayCap.ColorArray);
-            //GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, 0);
-            //GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
-
-            //_accelibo.Bind();
             GL.DrawElements(PrimitiveType.Triangles, _indices.Count, DrawElementsType.UnsignedInt, 0);
-            //_accelibo.Unbind();
-
-            //GL.DisableClientState(ArrayCap.ColorArray);
-            //GL.DisableClientState(ArrayCap.VertexArray);
+            
             Shaders.GenericShader.Stop();
             GL.BindVertexArray(0);
-            //_accelbuffer.Unbind();
         }
         public void Clear()
         {

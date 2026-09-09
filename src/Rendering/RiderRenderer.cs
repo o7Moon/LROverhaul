@@ -339,15 +339,6 @@ namespace linerider.Rendering
         }
         protected void EndDraw()
         {
-            /*int in_vertex = _shader.GetAttrib("in_vertex");
-            int in_texcoord = _shader.GetAttrib("in_texcoord");
-            int in_unit = _shader.GetAttrib("in_unit");
-            int in_color = _shader.GetAttrib("in_color");
-            GL.DisableVertexAttribArray(in_vertex);
-            GL.DisableVertexAttribArray(in_texcoord);
-            GL.DisableVertexAttribArray(in_unit);
-            GL.DisableVertexAttribArray(in_color);*/
-
             GL.ActiveTexture(TextureUnit.Texture5);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.ActiveTexture(TextureUnit.Texture4);

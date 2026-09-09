@@ -101,7 +101,6 @@ namespace linerider.Rendering
             buf.AddVertex(new GenericVertex((Vector2)tr, c, u2, v1));
             buf.AddVertex(new GenericVertex((Vector2)bl, c, u1, v2));
             buf.AddVertex(new GenericVertex((Vector2)br, c, u2, v2));
-            //using (new GLEnableCap(EnableCap.Texture2D))
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.BindTexture(TextureTarget.Texture2D, tex);
@@ -218,13 +217,7 @@ namespace linerider.Rendering
             gvao.AddVertex(new GenericVertex(new Vector2(rect.Left + rect.Width, rect.Top), color));
             gvao.AddVertex(new GenericVertex(new Vector2(rect.Left, rect.Top + rect.Height), color));
             gvao.AddVertex(new GenericVertex(new Vector2(rect.Left + rect.Width, rect.Top + rect.Height), color));
-            /*GL.Begin(PrimitiveType.Quads);
-            GL.Color4(color.R, color.G, color.B, color.A);
-            GL.Vertex2(new Vector2(rect.Left, rect.Top));
-            GL.Vertex2(new Vector2(rect.Left + rect.Width, rect.Top));
-            GL.Vertex2(new Vector2(rect.Left + rect.Width, rect.Top + rect.Height));
-            GL.Vertex2(new Vector2(rect.Left, rect.Top + rect.Height));
-            GL.End();*/
+            
             gvao.Draw(PrimitiveType.TriangleStrip);
         }
     }

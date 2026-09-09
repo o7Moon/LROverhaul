@@ -51,17 +51,11 @@ namespace linerider.UI.Widgets
             GameDrawingMatrix.UniformBlock.Translate(new Vector3(Bounds.Left, Bounds.Top + 16, 0));
             GameDrawingMatrix.UniformBlock.Rotate(360 * rotation, 0, 0, 1);
             
-            //GameDrawingMatrix.UniformBlock.Translate(trans);
-            //GameDrawingMatrix.UniformBlock.Scale(0.5f, 0.5f, 0);
-            //GameDrawingMatrix.UniformBlock.Translate(-trans);
             StaticRenderer.DrawTexture((int)m_texture.RendererData, new DoubleRect(-16, -16, 32, 32),
                 r: Color.R,
                 g: Color.G,
                 b: Color.B
             );
-            //skin.Renderer.DrawColor = Color.FromArgb(Alpha, Color);
-            //skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
-            //((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
             GameDrawingMatrix.UniformBlock.PopMatrix();
         }
     }

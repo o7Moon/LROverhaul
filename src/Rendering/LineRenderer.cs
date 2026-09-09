@@ -210,23 +210,15 @@ namespace linerider.Rendering
             if (_indices.Count == 0)
                 return;
             BeginDraw();
-            //_ibo.Bind();
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.DrawElements(PrimitiveType.Triangles, _indices.Count, DrawElementsType.UnsignedInt, 0);
             }
-            //_ibo.Unbind();
             EndDraw();
         }
         protected void EndDraw()
         {
-            /*GL.DisableVertexAttribArray(_shader.GetAttrib("in_vertex"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_color"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_circle"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_selectflags"));
-            GL.DisableVertexAttribArray(_shader.GetAttrib("in_linesize"));*/
             _shader.Stop();
-            //_vbo.Unbind();
             GL.BindVertexArray(0);
         }
         private void EnsureVBOSize(int size)

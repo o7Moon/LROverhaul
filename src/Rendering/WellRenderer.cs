@@ -49,13 +49,7 @@ namespace linerider.Rendering
             {
                 GL.BindVertexArray(_vao);
                 Shaders.GenericShader.Use();
-                //GL.EnableClientState(ArrayCap.VertexArray);
-                //GL.EnableClientState(ArrayCap.ColorArray);
-                //GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, 0);
-                //GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexcounter);
-                //GL.DisableClientState(ArrayCap.ColorArray);
-                //GL.DisableClientState(ArrayCap.VertexArray);
                 Shaders.GenericShader.Stop();
                 GL.BindVertexArray(0);
             }

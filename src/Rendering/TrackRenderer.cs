@@ -78,49 +78,46 @@ namespace linerider.Rendering
         }
         public void Render(DrawOptions options, bool recording = false)
         {
-            //using (new GLEnableCap(EnableCap.Texture2D))
-            //{
-                UpdateBuffers();
-                GL.BlendFunc(
-                    BlendingFactor.SrcAlpha,
-                    BlendingFactor.OneMinusSrcAlpha);
-                GameDrawingMatrix.Enter();
-                _physvbo.Scale = options.Zoom;
-                _physvbo.KnobState = options.KnobState;
+            UpdateBuffers();
+            GL.BlendFunc(
+                BlendingFactor.SrcAlpha,
+                BlendingFactor.OneMinusSrcAlpha);
+            GameDrawingMatrix.Enter();
+            _physvbo.Scale = options.Zoom;
+            _physvbo.KnobState = options.KnobState;
 
-                _sceneryvbo.Scale = options.Zoom;
-                // Green lines dont get lifelock
-                _sceneryvbo.KnobState = options.KnobState != KnobState.Hidden ? KnobState.Shown : KnobState.Hidden;
+            _sceneryvbo.Scale = options.Zoom;
+            // Green lines dont get lifelock
+            _sceneryvbo.KnobState = options.KnobState != KnobState.Hidden ? KnobState.Shown : KnobState.Hidden;
 
-                if ((Settings.PreviewMode || recording) && !(recording && !Settings.Recording.EnableColorTriggers))
-                {
-                    _sceneryvbo.OverrideColor = game.Track.Timeline.GetFrameLineColor(game.Track.Offset);
-                    _physvbo.OverrideColor = game.Track.Timeline.GetFrameLineColor(game.Track.Offset);
-                }
-                else
-                {
-                    _sceneryvbo.OverrideColor = Settings.Computed.LineColor;
-                    _physvbo.OverrideColor = Settings.Computed.LineColor;
-                }
+            if ((Settings.PreviewMode || recording) && !(recording && !Settings.Recording.EnableColorTriggers))
+            {
+                _sceneryvbo.OverrideColor = game.Track.Timeline.GetFrameLineColor(game.Track.Offset);
+                _physvbo.OverrideColor = game.Track.Timeline.GetFrameLineColor(game.Track.Offset);
+            }
+            else
+            {
+                _sceneryvbo.OverrideColor = Settings.Computed.LineColor;
+                _physvbo.OverrideColor = Settings.Computed.LineColor;
+            }
 
-                if (options.LineColors)
-                {
-                    _sceneryvbo.OverrideColor = Settings.Colors.SceneryLine;
-                    _sceneryvbo.OverridePriority = 1;
-                    _physvbo.OverridePriority = 1;
-                }
-                else
-                {
-                    _sceneryvbo.OverridePriority = 255; // Force override
-                    _physvbo.OverridePriority = 255;
-                }
-                _physvbo.Overlay = options.Overlay;
-                _sceneryvbo.Overlay = options.Overlay;
-                _sceneryvbo.Draw();
-                _decorator.DrawUnder(options);
-                _physvbo.Draw();
-                GameDrawingMatrix.Exit();
-            //}
+            if (options.LineColors)
+            {
+                _sceneryvbo.OverrideColor = Settings.Colors.SceneryLine;
+                _sceneryvbo.OverridePriority = 1;
+                _physvbo.OverridePriority = 1;
+            }
+            else
+            {
+                _sceneryvbo.OverridePriority = 255; // Force override
+                _physvbo.OverridePriority = 255;
+            }
+            _physvbo.Overlay = options.Overlay;
+            _sceneryvbo.Overlay = options.Overlay;
+            _sceneryvbo.Draw();
+            _decorator.DrawUnder(options);
+            _physvbo.Draw();
+            GameDrawingMatrix.Exit();
         }
         /// <summary>
         /// Clears the renderer and initializes it with new lines.

@@ -92,24 +92,6 @@ namespace linerider.Drawing
             EnsureBufferSize(Array.Count);
             _vbo.SetData(Array.unsafe_array, 0, 0, Array.Count);
             _shader.Use();
-            /*int in_vertex = _shader.GetAttrib("in_vertex");
-            int in_color = _shader.GetAttrib("in_color");
-            int in_circle = _shader.GetAttrib("in_circle");
-            int in_linesize = _shader.GetAttrib("in_linesize");
-            GL.EnableVertexAttribArray(in_vertex);
-            GL.EnableVertexAttribArray(in_circle);
-            GL.EnableVertexAttribArray(in_linesize);
-            GL.EnableVertexAttribArray(in_color);
-            fixed (float* ptr1 = &Array.unsafe_array[0].Position.X)
-            fixed (byte* ptr2 = &Array.unsafe_array[0].u)
-            fixed (float* ptr3 = &Array.unsafe_array[0].ratio)
-            fixed (int* ptr4 = &Array.unsafe_array[0].color)
-            {
-                GL.VertexAttribPointer(in_vertex, 2, VertexAttribPointerType.Float, false, LineVertex.Size, (IntPtr)ptr1);
-                GL.VertexAttribPointer(in_circle, 2, VertexAttribPointerType.Byte, false, LineVertex.Size, (IntPtr)ptr2);
-                GL.VertexAttribPointer(in_linesize, 2, VertexAttribPointerType.Float, false, LineVertex.Size, (IntPtr)ptr3);
-                GL.VertexAttribPointer(in_color, 4, VertexAttribPointerType.UnsignedByte, true, LineVertex.Size, (IntPtr)ptr4);
-            }*/
             int u_color = _shader.GetUniform("u_color");
             int u_scale = _shader.GetUniform("u_scale");
             int u_knobstate = _shader.GetUniform("u_knobstate");
@@ -122,8 +104,6 @@ namespace linerider.Drawing
         }
         protected override void InternalDraw(PrimitiveType primitive)
         {
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            //GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             using (new GLEnableCap(EnableCap.Blend))
             {
                 GL.DrawArrays(primitive, 0, Array.Count);
@@ -131,10 +111,6 @@ namespace linerider.Drawing
         }
         protected override void EndDraw()
         {
-            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_vertex"));
-            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_color"));
-            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_circle"));
-            //GL.DisableVertexAttribArray(_shader.GetAttrib("in_linesize"));
             _shader.Stop();
             GL.BindVertexArray(0);
             _vbo.Unbind();
