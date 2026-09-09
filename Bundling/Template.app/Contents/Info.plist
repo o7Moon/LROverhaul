@@ -2,15 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleExecutable</key>
-  <string>linerider</string>
-  <key>CFBundleIdentifier</key>
-  <string>dev.o7moon.LROverhaul</string> <!-- this can be changed but i have this domain and am currently the one packaging lro for mac so -->
-  <key>CFBundleName</key>
-  <string>LROverhaul</string>
-  <key>CFBundlePackageType</key>
-  <string>APPL</string>
-  <key>CFBundleIconFile</key>
-  <string>icon</string>
+	<key>CFBundleExecutable</key>
+	<string>linerider</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.LROverhaul</string>
+	<key>CFBundleName</key>
+	<string>LROverhaul</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>icon</string>
 </dict>
 </plist>
