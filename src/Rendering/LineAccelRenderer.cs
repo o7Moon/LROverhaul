@@ -1,41 +1,56 @@
+using System;
+using System.Collections.Generic;
 using linerider.Drawing;
 using linerider.Game;
 using linerider.Utils;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
+
 namespace linerider.Rendering
 {
     public class LineAccelRenderer : IDisposable
     {
         private const int ShapeSize = 3;
+
         private struct accelentry
         {
             public int start;
             public int shapes;
         }
-        private readonly AutoArray<int> _indices = new(LineRenderer.StartingLineCount / 4 * ShapeSize);
+
+        private readonly AutoArray<int> _indices = new(
+            LineRenderer.StartingLineCount / 4 * ShapeSize
+        );
         private readonly Dictionary<int, accelentry> _lookup = [];
         private readonly Queue<int> _freeverts = new();
         private int _vertcount = 0;
         private const int nullindex = 0;
         private readonly GLBuffer<GenericVertex> _accelbuffer;
         private readonly GLBuffer<int> _accelibo;
+
         public LineAccelRenderer()
         {
             _accelbuffer = new GLBuffer<GenericVertex>(BufferTarget.ArrayBuffer);
             _accelbuffer.Bind();
-            _accelbuffer.SetSize(LineRenderer.StartingLineCount / 2 * 3, BufferUsageHint.DynamicDraw, false);
+            _accelbuffer.SetSize(
+                LineRenderer.StartingLineCount / 2 * 3,
+                BufferUsageHint.DynamicDraw,
+                false
+            );
             _accelbuffer.Unbind();
             _accelibo = new GLBuffer<int>(BufferTarget.ElementArrayBuffer);
             _accelibo.Bind();
-            _accelibo.SetSize(LineRenderer.StartingLineCount / 2 * 3, BufferUsageHint.DynamicDraw, false);
+            _accelibo.SetSize(
+                LineRenderer.StartingLineCount / 2 * 3,
+                BufferUsageHint.DynamicDraw,
+                false
+            );
             _accelibo.Unbind();
         }
 
         public void Initialize(List<RedLine> lines)
         {
+            Console.WriteLine($"{lines.Count}");
             Clear();
             if (lines.Count == 0)
                 return;
@@ -43,13 +58,16 @@ namespace linerider.Rendering
             GenericVertex[][] redshapes = new GenericVertex[lines.Count * ShapeSize * 3][];
             ResourceSync initsync = new();
             int vertcount = 0;
-            _ = System.Threading.Tasks.Parallel.For(0, lines.Count,
-            (idx) =>
-            {
-                GenericVertex[] acc = GetAccelDecor(lines[idx]);
-                redshapes[idx] = acc;
-                _ = System.Threading.Interlocked.Add(ref vertcount, acc.Length);
-            });
+            _ = System.Threading.Tasks.Parallel.For(
+                0,
+                lines.Count,
+                (idx) =>
+                {
+                    GenericVertex[] acc = GetAccelDecor(lines[idx]);
+                    redshapes[idx] = acc;
+                    _ = System.Threading.Interlocked.Add(ref vertcount, acc.Length);
+                }
+            );
             GenericVertex[] verts = new GenericVertex[vertcount];
             _indices.EnsureCapacity(vertcount);
             _indices.UnsafeSetCount(vertcount);
@@ -57,11 +75,7 @@ namespace linerider.Rendering
             for (int idx = 0; idx < lines.Count; idx++)
             {
                 GenericVertex[] acc = redshapes[idx];
-                accelentry entry = new()
-                {
-                    start = shapepos,
-                    shapes = acc.Length / ShapeSize
-                };
+                accelentry entry = new() { start = shapepos, shapes = acc.Length / ShapeSize };
                 for (int i = 0; i < acc.Length; i++)
                 {
                     verts[shapepos] = acc[i];
@@ -72,6 +86,8 @@ namespace linerider.Rendering
             }
 
             _vertcount = verts.Length;
+            Console.WriteLine($"{_vertcount}");
+            Console.Out.Flush();
             _accelbuffer.Bind();
             EnsureVBOSize(verts.Length, false);
             _accelbuffer.SetData(verts, 0, 0, verts.Length);
@@ -81,6 +97,7 @@ namespace linerider.Rendering
             _accelibo.SetData(_indices.unsafe_array, 0, 0, _indices.Count);
             _accelibo.Unbind();
         }
+
         public void Draw(DrawOptions draw)
         {
             _accelbuffer.Bind();
@@ -91,7 +108,12 @@ namespace linerider.Rendering
             GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, 8);
 
             _accelibo.Bind();
-            GL.DrawElements(PrimitiveType.Triangles, _indices.Count, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(
+                PrimitiveType.Triangles,
+                _indices.Count,
+                DrawElementsType.UnsignedInt,
+                0
+            );
             _accelibo.Unbind();
 
             GL.DisableClientState(ArrayCap.ColorArray);
@@ -99,6 +121,7 @@ namespace linerider.Rendering
 
             _accelbuffer.Unbind();
         }
+
         public void Clear()
         {
             _vertcount = 0;
@@ -106,6 +129,7 @@ namespace linerider.Rendering
             _freeverts.Clear();
             _lookup.Clear();
         }
+
         public void AddLine(RedLine line)
         {
             if (_lookup.ContainsKey(line.ID))
@@ -113,17 +137,12 @@ namespace linerider.Rendering
                 LineChanged(line, false);
                 return;
             }
-            _lookup.Add(
-                line.ID,
-                new accelentry()
-                {
-                    start = _indices.Count,
-                    shapes = 0
-                });
+            _lookup.Add(line.ID, new accelentry() { start = _indices.Count, shapes = 0 });
             DrawAccel(line, false);
-
         }
+
         public void LineChanged(RedLine line, bool hit) => DrawAccel(line, hit);
+
         public void RemoveLine(RedLine line)
         {
             accelentry accel = _lookup[line.ID];
@@ -146,16 +165,20 @@ namespace linerider.Rendering
                 _indices.unsafe_array,
                 accel.start,
                 accel.start,
-                accel.shapes * ShapeSize);
+                accel.shapes * ShapeSize
+            );
             _accelibo.Unbind();
         }
+
         /// <summary>
         /// Redraws the red line accel indicator.
         /// </summary>
         private void DrawAccel(RedLine line, bool hide)
         {
             accelentry entry = _lookup[line.ID];
-            GenericVertex[] newdecor = hide ? new GenericVertex[(int)Math.Round(ShapeSize * line.Multiplier)] : GetAccelDecor(line);
+            GenericVertex[] newdecor = hide
+                ? new GenericVertex[(int)Math.Round(ShapeSize * line.Multiplier)]
+                : GetAccelDecor(line);
             int shapes = newdecor.Length / ShapeSize;
 
             for (int ix = 0; ix < entry.shapes; ix++)
@@ -176,11 +199,7 @@ namespace linerider.Rendering
             for (int ix = 0; ix < shapes; ix++)
             {
                 int vertexbase = GetVertexBase();
-                _accelbuffer.SetData(
-                    newdecor,
-                    ShapeSize * ix,
-                    vertexbase,
-                    ShapeSize);
+                _accelbuffer.SetData(newdecor, ShapeSize * ix, vertexbase, ShapeSize);
                 for (int i = 0; i < ShapeSize; i++)
                 {
                     if (growing)
@@ -201,7 +220,8 @@ namespace linerider.Rendering
                 _indices.unsafe_array,
                 entry.start,
                 entry.start,
-                entry.shapes * ShapeSize);
+                entry.shapes * ShapeSize
+            );
             if (growing)
             {
                 int startindex = _indices.Count - shapes * ShapeSize;
@@ -210,15 +230,13 @@ namespace linerider.Rendering
                     _indices.unsafe_array,
                     startindex,
                     startindex,
-                    shapes * ShapeSize);
-                _lookup[line.ID] = new accelentry()
-                {
-                    shapes = shapes,
-                    start = startindex
-                };
+                    shapes * ShapeSize
+                );
+                _lookup[line.ID] = new accelentry() { shapes = shapes, start = startindex };
             }
             _accelibo.Unbind();
         }
+
         private int GetVertexBase()
         {
             if (_freeverts.Count != 0)
@@ -228,6 +246,7 @@ namespace linerider.Rendering
             EnsureVBOSize(_vertcount);
             return ret;
         }
+
         private void EnsureVBOSize(int size, bool copyonresize = true)
         {
             if (size > _accelbuffer.BufferSize)
@@ -237,6 +256,7 @@ namespace linerider.Rendering
                 _accelbuffer.SetSize(size * 2, BufferUsageHint.DynamicDraw, copyonresize);
             }
         }
+
         private void EnsureIBOSize(int size, bool copyonresize = true)
         {
             if (size > _accelibo.BufferSize)
@@ -246,6 +266,7 @@ namespace linerider.Rendering
                 _accelibo.SetSize(size * 2, BufferUsageHint.DynamicDraw, copyonresize);
             }
         }
+
         /// <summary>
         /// Checks if a line in the index buffer was 'removed'
         /// basically nulled out
@@ -259,12 +280,14 @@ namespace linerider.Rendering
             }
             return true;
         }
+
         public void Dispose() => _accelbuffer.Dispose();
+
         public static GenericVertex[] GetAccelDecor(RedLine line)
         {
             Color linecolor = Settings.Colors.AccelerationLine;
             double multiplier = line.Multiplier;
-            int shapecount = (int)Math.Round(multiplier, 3);
+            int shapecount = (int)Math.Min(multiplier, 3); // this is weird i dont know why we did this but it caused unbounded memory allocation so here is the hall of shame for this single line of code: (int)Math.Round(multiplier, 3);
             if (multiplier > 3)
                 shapecount += 4;
             GenericVertex[] ret = new GenericVertex[3 * shapecount];
@@ -291,7 +314,11 @@ namespace linerider.Rendering
                 Vector2d c = angle2.MovePoint(b, 3);
 
                 Vector2[] tall = Utility.GetThickLine(
-                    (Vector2)b, (Vector2)c, Angle.FromVector(c - b), 0.5f);
+                    (Vector2)b,
+                    (Vector2)c,
+                    Angle.FromVector(c - b),
+                    0.5f
+                );
                 Vector2[] tess = Utility.TesselateThickLine(tall);
                 for (int i = 0; i < tess.Length; i++)
                 {
@@ -302,8 +329,7 @@ namespace linerider.Rendering
                 b = angle.MovePoint(a, -1.5);
                 c = angle.MovePoint(a, 1.5);
 
-                tall = Utility.GetThickLine(
-                    (Vector2)b, (Vector2)c, Angle.FromVector(c - b), 0.5f);
+                tall = Utility.GetThickLine((Vector2)b, (Vector2)c, Angle.FromVector(c - b), 0.5f);
                 tess = Utility.TesselateThickLine(tall);
                 for (int i = 0; i < tess.Length; i++)
                 {
