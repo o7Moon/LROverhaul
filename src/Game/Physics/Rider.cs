@@ -130,14 +130,14 @@ namespace linerider.Game
 
         public Vector2d CalculateCenter()
         {
-            if (Crashed)
-                return Body[4].Location;
+            //if (Crashed)
+            //    return Body[4].Location;
             Vector2d anchorsaverage = new();
-            for (int i = 0; i < Body.Length; i++)
+            for (int i = 0; i < 4; i++)
             {
                 anchorsaverage += Body[i].Location;
             }
-            return anchorsaverage / Body.Length;
+            return anchorsaverage / 4;
         }
 
         public double CalculateStrain(Bone[] bones)
